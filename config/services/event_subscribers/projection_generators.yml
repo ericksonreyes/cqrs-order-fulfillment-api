@@ -1,0 +1,4 @@
+services:
+
+  account_projector:
+    class: App\Services\EventSubscribers\ProjectionGenerators\AccountProjectionGenerator

@@ -1,0 +1,9 @@
+services:
+# Models
+#  account_model:
+#    class: App\Models\Query\Account
+
+# Repositories
+#  readonly_account_repository:
+#    class: App\Repositories\Query\MySQL\MySQLReadOnlyAccountRepository
+#    arguments: ['@account_model']

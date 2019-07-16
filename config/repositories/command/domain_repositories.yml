@@ -1,0 +1,4 @@
+services:
+  account_repository:
+    class: App\Repositories\Command\EventSourcedAccountRepository
+    arguments: ['@event_store']

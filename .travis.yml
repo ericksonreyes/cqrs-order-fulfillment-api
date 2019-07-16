@@ -1,0 +1,18 @@
+language: php
+
+php:
+- 5.6
+- 7.0
+
+fast_finish: true
+
+sudo: false
+
+before_script:
+- composer install --no-progress
+
+script:
+- php ./bin/phing
+
+after_success:
+- bin/php-coveralls -v

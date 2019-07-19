@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 
-class AccountController extends Controller
+class ProductsController extends Controller
 {
 
     /**

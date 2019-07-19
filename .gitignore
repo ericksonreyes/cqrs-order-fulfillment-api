@@ -13,3 +13,4 @@ cghooks.lock
 composer.lock
 /php.ini
 /php-silent.ini
+/database/database.sqlite

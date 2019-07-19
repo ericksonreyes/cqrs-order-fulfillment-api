@@ -23,9 +23,9 @@ $router->get('/', 'HomeController@index');
  * Public end points.
  *
  */
-$router->group(['prefix' => '/' . env('APP_VERSION') . '/banking/rest'], function () use ($router) {
+$router->group(['prefix' => '/' . env('APP_VERSION') . '/v1/api'], function () use ($router) {
+    $router->post('/auth', 'AuthenticationController@auth');
 });
-
 
 /**
  *
@@ -33,6 +33,22 @@ $router->group(['prefix' => '/' . env('APP_VERSION') . '/banking/rest'], functio
  *
  */
 $router->group(['middleware' => 'auth'], function () use ($router) {
-    $router->group(['prefix' => '/' . env('APP_VERSION') . '/banking/rest'], function () use ($router) {
+    $router->group(['prefix' => '/' . env('APP_VERSION') . '/v1/api'], function () use ($router) {
+
+        /**
+         * Products
+         */
+        $router->post('/products', 'ProductsController@findAll');
+        $router->post('/products/$id', 'ProductsController@findOne');
+
+        /**
+         * Orders
+         */
+        $router->post('/orders', 'OrdersController@findAll');
+        $router->post('/orders/$id', 'OrdersController@findOne');
+        $router->put('/orders/$id/accept', 'OrdersController@accept');
+        $router->put('/orders/$id/ship', 'OrdersController@ship');
+        $router->put('/orders/$id/cancel', 'OrdersController@cancel');
+        $router->put('/orders/$id/complete', 'OrdersController@complete');
     });
 });

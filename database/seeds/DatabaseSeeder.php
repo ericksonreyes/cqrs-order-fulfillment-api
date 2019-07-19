@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         if (env('APP_ENV') !== 'production') {
+            $this->call(Products::class);
         }
     }
 }

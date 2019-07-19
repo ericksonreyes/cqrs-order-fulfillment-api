@@ -2,19 +2,10 @@ parameters:
   application_host: 'http://localhost:8000'
   issuer_name: null
   jwt_algorithm: HS256
-  jwt_secret_key: SECRET
-  jwt_encryption_key_file: /home/user/.ssh/id_rsa_jwt.pem
-  jwt_decryption_key_file: /home/user/.ssh/id_rsa_jwt.pub
+  jwt_secret_key: secret-word
   rabbitmq_host: 127.0.0.1
   rabbitmq_port: 5672
   rabbitmq_username: guest
   rabbitmq_password: guest
   rabbitmq_vhost: /
-  rabbitmq_exchange_name: events
-  elasticsearch_event_store_hosts:
-    - 'localhost:9200'
-  smtp_host: smtp.gmail.com
-  smtp_port: 465
-  smtp_encryption: ssl
-  smtp_username: acme@gmail.com
-  smtp_password: acmepassword
+  rabbitmq_exchange_name: orders

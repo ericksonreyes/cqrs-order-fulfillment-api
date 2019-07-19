@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Illuminate\Mail\MailServiceProvider;
 use Nord\Lumen\Cors\CorsServiceProvider;
-use Sentry\Laravel\ServiceProvider;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -95,7 +94,6 @@ $app->routeMiddleware([
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(CorsServiceProvider::class);
 $app->register(MailServiceProvider::class);
-$app->register(ServiceProvider::class);
 
 $app->bind(ContainerInterface::class, function () {
 

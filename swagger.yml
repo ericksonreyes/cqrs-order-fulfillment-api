@@ -1,1076 +1,81 @@
 swagger: "2.0"
 info:
   version: "1.0.0"
-  title: "ACME RESTful API Server"
-  description: "ACME RESTful API"
+  title: "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API"
+  description: "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API"
   contact:
     email: "support@acme.com"
-host: "rest.acme.com"
+host: "localhost:8000"
 basePath: "/v1/api/"
 schemes:
   - "http"
-  - "https"
 consumes:
   - application/json
 produces:
   - application/json
 tags:
-  - name: Users
-    description: A group of registered acme users.
-    externalDocs:
-      description: "Read more"
-      url: "http://www.acme.com/how-to-use-acme/teams"
-  - name: Tickets
-    description: A group of tickets inside a team or organization.
-    externalDocs:
-      description: "Read more"
-      url: "http://www.acme.com/how-to-use-acme/tickets"
-  - name: Tasks
-    description: A group of personal scheduled or listed tasks.
-    externalDocs:
-      description: "Read more"
-      url: "http://www.acme.com/how-to-use-acme/tasks"
+  - name: Employee
+    description: The employee who will be using this REST API.
+  - name: Product
+    description: The product we are selling.
+  - name: Order
+    description: The existing customer orders.
 
 paths:
-
-  /users:
-    get:
-      tags:
-        - Users
-      summary: Get all users.
-      description: API for getting all users.
-      operationId: getAllUsers
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: query
-          in: query
-          description: Search for resources containing the search keyword.
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: The desired page number.
-          required: false
-          type: integer
-          default: 1
-        - name: size
-          in: query
-          description: The maximum number of resources per page.
-          required: false
-          type: integer
-          default: 10
-        - name: sort
-          in: query
-          description: "Sort resources by this field (Ex.: Use ?sort=fieldName to sort by name in ascending order or sort=-fieldName for descending order."
-          required: false
-          type: string
-          default: id
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/User'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /users/{userId}:
-    get:
-      tags:
-        - Users
-      summary: Get one user.
-      description: API for getting one user.
-      operationId: getOneUser
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: userId
-          description: A user identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: ""
-          headers:
-            ETag:
-              type: string
-              description: Entity Tag. A hash representation of the resource used for browser cache detection.
-            Last-Modified:
-              type: integer
-              description: Timestamp when the last time the resource was updated.
-          schema:
-            $ref: '#/definitions/User'
-        304:
-          $ref: '#/responses/NotModified'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        410:
-          $ref: '#/responses/DeletedResource'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /users/{userId}/revision-history:
-    get:
-      tags:
-        - Users
-      summary: Get all revision history of a user.
-      description: API for getting the revision history of a user.
-      operationId: getUserRevisionHistory
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: userId
-          description: A user identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Event'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets:
-    get:
-      tags:
-        - Tickets
-      summary: Get all tickets.
-      description: API for getting all tickets.
-      operationId: getAllTickets
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: query
-          in: query
-          description: Search for resources containing the search keyword.
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: The desired page number.
-          required: false
-          type: integer
-          default: 1
-        - name: size
-          in: query
-          description: The maximum number of resources per page.
-          required: false
-          type: integer
-          default: 10
-        - name: sort
-          in: query
-          description: "Sort resources by this field (Ex.: Use ?sort=fieldName to sort by name in ascending order or sort=-fieldName for descending order."
-          required: false
-          type: string
-          default: id
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Ticket'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
+  /auth:
     post:
       tags:
-        - Tickets
-      summary: Creates tickets.
-      description: API for creating tickets.
-      operationId: createTickets
-      security:
-        - bearerAuth: []
+        - Employee
+      summary: Employee authentication.
+      description: API for authenticating customers. Default username is "employee" and password is "password"
+      operationId: authenticateEmployee
       parameters:
         - name: body
-          description: A collection of new tickets.
+          description: Employee login credentials
           in: body
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Ticket'
-      responses:
-        201:
-          description: A collection of newly created tickets.
           schema:
             type: object
             properties:
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Ticket'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}:
-    get:
-      tags:
-        - Tickets
-      summary: Get one ticket.
-      description: API for getting one ticket.
-      operationId: getOneTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: ""
-          headers:
-            ETag:
-              type: string
-              description: Entity Tag. A hash representation of the resource used for browser cache detection.
-            Last-Modified:
-              type: integer
-              description: Timestamp when the last time the resource was updated.
-          schema:
-            $ref: '#/definitions/Ticket'
-        304:
-          $ref: '#/responses/NotModified'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    put:
-      tags:
-        - Tickets
-      summary: Updates a ticket.
-      description: API for updating a ticket.
-      operationId: updateTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: body
-          description: A revised ticket resource.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/Ticket'
-      responses:
-        204:
-          $ref: '#/responses/ResourceUpdated'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        409:
-          $ref: '#/responses/ResourceConflict'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    delete:
-      tags:
-        - Tickets
-      summary: Deletes a ticket.
-      description: API for deleting a ticket.
-      operationId: deleteTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        204:
-          $ref: '#/responses/ResourceDeleted'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/revision-history:
-    get:
-      tags:
-        - Tickets
-      summary: Get all revision history of a ticket.
-      description: API for getting the revision history of a ticket.
-      operationId: getTicketRevisionHistory
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Event'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/duplicate:
-    post:
-      tags:
-        - Tickets
-      summary: Duplicates a task.
-      operationId: duplicateTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: body
-          description: The title of the duplicated ticket.
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              title:
+              username:
+                type: string
+              password:
                 type: string
             required:
-              - title
+              - username
+              - password
       responses:
-        201:
-          description: A collection of newly duplicated ticket.
+        200:
+          description: Employee authenticated.
           schema:
             type: object
             properties:
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Ticket'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/share:
-    post:
-      tags:
-        - Tickets
-      summary: Shares a task.
-      operationId: shareTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: body
-          description: To whom you will share the resource.
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              userId:
+              accessToken:
                 type: string
-              email:
-                type: string
-      responses:
-        202:
-          $ref: '#/responses/RequestAccepted'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/collaborators:
-    get:
-      tags:
-        - Tickets
-      summary: Get all ticket collaborators.
-      operationId: getTicketCollaborators
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/User'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidCollection'
-        401:
-          $ref: '#/responses/ExpiredSession'
         403:
           $ref: '#/responses/AccessDenied'
         404:
           $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
         500:
           $ref: '#/responses/ServerError'
         503:
           $ref: '#/responses/ServerUnavailable'
 
-  /tickets/{ticketId}/archive:
-    put:
-      tags:
-        - Tickets
-      summary: Archives a ticket.
-      description: API for archiving a ticket.
-      operationId: archiveTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        204:
-          $ref: '#/responses/RequestPerformed'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        402:
-          $ref: '#/responses/PaidOperation'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/restore:
-    put:
-      tags:
-        - Tickets
-      summary: Restores a ticket.
-      description: API for restoring a ticket.
-      operationId: restoreTicket
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        204:
-          $ref: '#/responses/RequestPerformed'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        402:
-          $ref: '#/responses/PaidOperation'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/attachments:
+  /orders:
     get:
       tags:
-        - Tickets
-      summary: Get all ticket attachments.
-      description: API for getting all ticket attachments.
-      operationId: getAllTicketAttachments
+        - Order
+      summary: Customer Orders.
+      description: API for getting all the customer's orders.
+      operationId: getAllCustomerOrders
       security:
         - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: query
-          in: query
-          description: Search for resources containing the search keyword.
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: The desired page number.
-          required: false
-          type: integer
-          default: 1
-        - name: size
-          in: query
-          description: The maximum number of resources per page.
-          required: false
-          type: integer
-          default: 10
-        - name: sort
-          in: query
-          description: "Sort resources by this field (Ex.: Use ?sort=fieldName to sort by name in ascending order or sort=-fieldName for descending order."
-          required: false
-          type: string
-          default: id
       responses:
         200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Attachment'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    post:
-      tags:
-        - Tickets
-      summary: Uploads file attachment to a ticket.
-      description: API for uploading a file attachment to a ticket.
-      operationId: uploadTicketAttachment
-      security:
-        - bearerAuth: []
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: file
-          description: The file to upload.
-          in: formData
-          type: file
-      responses:
-        201:
-          $ref: '#/definitions/Attachment'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/attachments/{attachmentId}:
-    delete:
-      tags:
-        - Tickets
-      summary: Deletes a ticket attachment.
-      description: API for deleting a ticket attachment.
-      operationId: deleteTicketAttachment
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: attachmentId
-          description: An attachment identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        204:
-          $ref: '#/responses/ResourceDeleted'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tickets/{ticketId}/conversations:
-    get:
-      tags:
-        - Tickets
-      summary: Get all ticket conversations.
-      description: API for getting all ticket conversations.
-      operationId: getAllTicketConversations
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: query
-          in: query
-          description: Search for resources containing the search keyword.
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: The desired page number.
-          required: false
-          type: integer
-          default: 1
-        - name: size
-          in: query
-          description: The maximum number of resources per page.
-          required: false
-          type: integer
-          default: 10
-        - name: sort
-          in: query
-          description: "Sort resources by this field (Ex.: Use ?sort=fieldName to sort by name in ascending order or sort=-fieldName for descending order."
-          required: false
-          type: string
-          default: id
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Message'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    post:
-      tags:
-        - Tickets
-      summary: Add message to a conversation.
-      description: API for adding a message to a conversation.
-      operationId: addConversationMessage
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: body
-          description: A collection of new messages.
-          in: body
+          description: A collection of customer's orders.
           schema:
             type: array
             items:
-              $ref: '#/definitions/Message'
-      responses:
-        201:
-          description: A collection of newly added messages to the conversation.
-          schema:
-            type: object
-            properties:
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Message'
+              $ref: '#/definitions/Order'
         400:
           $ref: '#/responses/BadRequest'
         402:
@@ -1081,10 +86,8 @@ paths:
           $ref: '#/responses/UnauthorizedRequest'
         404:
           $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
+        410:
+          $ref: '#/responses/DeletedResource'
         422:
           $ref: '#/responses/UnprocessableEntity'
         429:
@@ -1094,38 +97,26 @@ paths:
         503:
           $ref: '#/responses/ServerUnavailable'
 
-  /tickets/{ticketId}/conversations/{messageId}:
+  /orders/{id}:
     get:
       tags:
-        - Tickets
-      summary: Get one conversation message.
-      description: API for getting one conversation message.
-      operationId: getOneConversationMessage
+        - Order
+      summary: Get one order.
+      description: API for getting one order.
+      operationId: getOneOrder
       security:
         - bearerAuth: []
       parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: messageId
-          description: A conversation message identifier.
+        - name: id
+          description: An order identifier.
           in: path
           required: true
           type: string
       responses:
         200:
-          description: ""
-          headers:
-            ETag:
-              type: string
-              description: Entity Tag. A hash representation of the resource used for browser cache detection.
-            Last-Modified:
-              type: integer
-              description: Timestamp when the last time the resource was updated.
+          description: "An existing order."
           schema:
-            $ref: '#/definitions/Message'
+            $ref: '#/definitions/Order'
         304:
           $ref: '#/responses/NotModified'
         400:
@@ -1144,78 +135,25 @@ paths:
           $ref: '#/responses/ServerError'
         503:
           $ref: '#/responses/ServerUnavailable'
+
+  /orders/{id}/accept:
     put:
       tags:
-        - Tickets
-      summary: Updates a ticket conversation message.
-      description: API for updating a ticket conversation message.
-      operationId: updateTicketConversationMessage
+        - Order
+      summary: Marks an order as accepted.
+      description: API for accepting an order.
+      operationId: acceptOrder
+      parameters:
+        - name: id
+          description: An order identifier.
+          in: path
+          required: true
+          type: string
       security:
         - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: messageId
-          description: A conversation message identifier.
-          in: path
-          required: true
-          type: string
-        - name: body
-          description: A revised ticket resource.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/Message'
       responses:
         204:
-          $ref: '#/responses/ResourceUpdated'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        409:
-          $ref: '#/responses/ResourceConflict'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    delete:
-      tags:
-        - Tickets
-      summary: Deletes a ticket conversation message.
-      description: API for deleting a ticket conversation message.
-      operationId: deleteTicketConversationMessage
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: A ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: messageId
-          description: A conversation message identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        204:
-          $ref: '#/responses/ResourceDeleted'
+          $ref: '#/responses/RequestPerformed'
         400:
           $ref: '#/responses/BadRequest'
         402:
@@ -1237,311 +175,40 @@ paths:
         503:
           $ref: '#/responses/ServerUnavailable'
 
-  /tickets/{ticketId}/conversations/{messageId}/revision-history:
-    get:
-      tags:
-        - Tickets
-      summary: Get all revision history of a conversation message.
-      description: API for getting the revision history of a conversation message.
-      operationId: getTicketConversationMessageRevisionHistory
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: ticketId
-          description: Ticket identifier.
-          in: path
-          required: true
-          type: string
-        - name: messageId
-          description: Conversation message identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Event'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-
-  /tasks:
-    get:
-      tags:
-        - Tasks
-      summary: Get all user tasks.
-      description: API for getting all user tasks
-      operationId: getAllUserTasks
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: query
-          in: query
-          description: Search for resources containing the search keyword.
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: The desired page number.
-          required: false
-          type: integer
-          default: 1
-        - name: size
-          in: query
-          description: The maximum number of resources per page.
-          required: false
-          type: integer
-          default: 10
-        - name: sort
-          in: query
-          description: "Sort resources by this field (Ex.: Use ?sort=fieldName to sort by name in ascending order or sort=-fieldName for descending order."
-          required: false
-          type: string
-          default: id
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Task'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    post:
-      tags:
-        - Tasks
-      summary: Creates tasks.
-      description: API for creating tasks.
-      operationId: createTasks
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: body
-          description: A collection of new tasks.
-          in: body
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Task'
-      responses:
-        201:
-          description: A collection of newly created tasks.
-          schema:
-            type: object
-            properties:
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Task'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tasks/{taskId}:
-    get:
-      tags:
-        - Tasks
-      summary: Get one user task.
-      description: API for getting one user task.
-      operationId: getOneUserTask
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: ""
-          headers:
-            ETag:
-              type: string
-              description: Entity Tag. A hash representation of the resource used for browser cache detection.
-            Last-Modified:
-              type: integer
-              description: Timestamp when the last time the resource was updated.
-          schema:
-            $ref: '#/definitions/Task'
-        304:
-          $ref: '#/responses/NotModified'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
+  /orders/{id}/ship:
     put:
       tags:
-        - Tasks
-      summary: Updates a task.
-      description: API for updating a task.
-      operationId: updateTask
-      security:
-        - bearerAuth: []
+        - Order
+      summary: Marks an order as shipped.
+      description: API for shipping an order.
+      operationId: shipOrder
       parameters:
-        - name: taskId
-          description: A task identifier.
+        - name: id
+          description: An order identifier.
           in: path
           required: true
           type: string
         - name: body
-          description: A revised task resource.
+          description: The shipping details
           in: body
-          required: true
           schema:
-            $ref: '#/definitions/Task'
-      responses:
-        204:
-          $ref: '#/responses/ResourceUpdated'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        409:
-          $ref: '#/responses/ResourceConflict'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-    delete:
-      tags:
-        - Tasks
-      summary: Deletes a task.
-      description: API for deleting a task.
-      operationId: deleteTask
+            type: object
+            properties:
+              shipper:
+                type: string
+              trackingId:
+                type: string
+              dateShipped:
+                type: integer
+            required:
+              - trackinId
+              - shipper
+              - dateShipped
       security:
         - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
       responses:
         204:
-          $ref: '#/responses/ResourceDeleted'
+          $ref: '#/responses/RequestPerformed'
         400:
           $ref: '#/responses/BadRequest'
         402:
@@ -1563,60 +230,34 @@ paths:
         503:
           $ref: '#/responses/ServerUnavailable'
 
-  /tasks/{taskId}/revision-history:
-    get:
+  /orders/{id}/complete:
+    put:
       tags:
-        - Tasks
-      summary: Get all revision history of a conversation message.
-      description: API for getting the revision history of a conversation message.
-      operationId: getTaskRevisionHistory
-      security:
-        - bearerAuth: []
+        - Order
+      summary: Marks an order as complete.
+      description: API for completing an order.
+      operationId: completeOrder
       parameters:
-        - name: taskId
-          description: Task identifier.
+        - name: id
+          description: An order identifier.
           in: path
           required: true
           type: string
+      security:
+        - bearerAuth: []
       responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Event'
+        204:
+          $ref: '#/responses/RequestPerformed'
         400:
           $ref: '#/responses/BadRequest'
+        402:
+          $ref: '#/responses/PaidOperation'
         401:
           $ref: '#/responses/ExpiredSession'
         403:
-          $ref: '#/responses/AccessDenied'
+          $ref: '#/responses/UnauthorizedRequest'
         404:
           $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
         410:
           $ref: '#/responses/DeletedResource'
         422:
@@ -1628,205 +269,44 @@ paths:
         503:
           $ref: '#/responses/ServerUnavailable'
 
-  /tasks/{taskId}/duplicate:
-    post:
+  /orders/{id}/cancel:
+    put:
       tags:
-        - Tasks
-      summary: Duplicates a task.
-      operationId: duplicateTask
-      security:
-        - bearerAuth: []
+        - Order
+      summary: Marks an order as cancelled.
+      description: API for cancelling an order.
+      operationId: cancelOrder
       parameters:
-        - name: taskId
-          description: A task identifier.
+        - name: id
+          description: An order identifier.
           in: path
           required: true
           type: string
         - name: body
-          description: The name of the duplicated task.
+          description: The cancellation details
           in: body
-          required: true
           schema:
             type: object
             properties:
-              newName:
+              reason:
                 type: string
             required:
-              - newName
-      responses:
-        201:
-          description: A collection of newly duplicated task.
-          schema:
-            type: object
-            properties:
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Task'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tasks/{taskId}/share:
-    post:
-      tags:
-        - Tasks
-      summary: Shares a task.
-      operationId: shareTask
+              - reason
       security:
         - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-        - name: body
-          description: To whom you will share the resource.
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              userId:
-                type: string
-              email:
-                type: string
-      responses:
-        202:
-          $ref: '#/responses/RequestAccepted'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tasks/{taskId}/collaborators:
-    get:
-      tags:
-        - Tasks
-      summary: Get all task collaborators.
-      operationId: getTaskCollaborators
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
-          schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/User'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidCollection'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/AccessDenied'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tasks/{taskId}/archive:
-    put:
-      tags:
-        - Tasks
-      summary: Archives a task.
-      description: API for archiving a task.
-      operationId: archiveTask
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
       responses:
         204:
           $ref: '#/responses/RequestPerformed'
         400:
           $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
         402:
           $ref: '#/responses/PaidOperation'
+        401:
+          $ref: '#/responses/ExpiredSession'
         403:
           $ref: '#/responses/UnauthorizedRequest'
         404:
           $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
         410:
           $ref: '#/responses/DeletedResource'
         422:
@@ -1838,114 +318,22 @@ paths:
         503:
           $ref: '#/responses/ServerUnavailable'
 
-  /tasks/{taskId}/restore:
-    put:
-      tags:
-        - Tasks
-      summary: Restores a task.
-      description: API for restoring a task.
-      operationId: restoreTask
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-      responses:
-        204:
-          $ref: '#/responses/RequestPerformed'
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        402:
-          $ref: '#/responses/PaidOperation'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        410:
-          $ref: '#/responses/DeletedResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
-
-  /tasks/{taskId}/attachments:
+  /products:
     get:
       tags:
-        - Tasks
-      summary: Get all task attachments.
-      description: API for getting all task attachments.
-      operationId: getAllTaskAttachments
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-        - name: query
-          in: query
-          description: Search for resources containing the search keyword.
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: The desired page number.
-          required: false
-          type: integer
-          default: 1
-        - name: size
-          in: query
-          description: The maximum number of resources per page.
-          required: false
-          type: integer
-          default: 10
-        - name: sort
-          in: query
-          description: "Sort resources by this field (Ex.: Use ?sort=fieldName to sort by name in ascending order or sort=-fieldName for descending order."
-          required: false
-          type: string
-          default: id
+        - Product
+      summary: Get all our products.
+      description: API for getting all products.
+      operationId: getAllProducts
       responses:
         200:
-          description: A collection of stored resources.
-          headers:
-            X-Resources-Count:
-              type: integer
-              description: Number of resources in the current page.
-            X-Resources-Total:
-              type: integer
-              description: Total number of resources in the collection.
-            X-Resources-Per-Page:
-              type: integer
-              description: Maximum number of resources allowed in a page.
-            X-Pages-Count:
-              type: integer
-              description: Total number of pages in the collection.
+          description: Collection of our existing products.
           schema:
-            type: object
-            properties:
-              _meta:
-                $ref: '#/definitions/Meta'
-              _links:
-                type: array
-                items:
-                  $ref: '#/definitions/Link'
-              _embedded:
-                type: array
-                items:
-                  $ref: '#/definitions/Attachment'
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        304:
+          $ref: '#/responses/NotModified'
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -1962,87 +350,35 @@ paths:
           $ref: '#/responses/ServerError'
         503:
           $ref: '#/responses/ServerUnavailable'
-    post:
-      tags:
-        - Tasks
-      summary: Uploads file attachment to a task.
-      description: API for uploading a file attachment to a task.
-      operationId: uploadTaskAttachment
-      security:
-        - bearerAuth: []
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-        - name: file
-          description: The file to upload.
-          in: formData
-          type: file
-      responses:
-        201:
-          $ref: '#/definitions/Attachment'
-        400:
-          $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
-        401:
-          $ref: '#/responses/ExpiredSession'
-        403:
-          $ref: '#/responses/UnauthorizedRequest'
-        404:
-          $ref: '#/responses/ResourceNotFound'
-        405:
-          $ref: '#/responses/MethodNotAllowed'
-        409:
-          $ref: '#/responses/DuplicateResource'
-        422:
-          $ref: '#/responses/UnprocessableEntity'
-        429:
-          $ref: '#/responses/TooManyRequests'
-        500:
-          $ref: '#/responses/ServerError'
-        503:
-          $ref: '#/responses/ServerUnavailable'
 
-  /tasks/{taskId}/attachments/{attachmentId}:
-    delete:
+  /products/{id}:
+    get:
       tags:
-        - Tasks
-      summary: Deletes a task attachment.
-      description: API for deleting a task attachment.
-      operationId: deleteTaskAttachment
-      security:
-        - bearerAuth: []
+        - Product
+      summary: Get one product.
+      description: API for getting one product.
+      operationId: getOneProduct
       parameters:
-        - name: taskId
-          description: A task identifier.
-          in: path
-          required: true
-          type: string
-        - name: attachmentId
-          description: An attachment identifier.
+        - name: id
+          description: A product unique identifier.
           in: path
           required: true
           type: string
       responses:
-        204:
-          $ref: '#/responses/ResourceDeleted'
+        200:
+          description: ""
+          schema:
+            $ref: '#/definitions/Product'
+        304:
+          $ref: '#/responses/NotModified'
         400:
           $ref: '#/responses/BadRequest'
-        402:
-          $ref: '#/responses/PaidOperation'
         401:
           $ref: '#/responses/ExpiredSession'
         403:
-          $ref: '#/responses/UnauthorizedRequest'
+          $ref: '#/responses/AccessDenied'
         404:
           $ref: '#/responses/ResourceNotFound'
-        410:
-          $ref: '#/responses/DeletedResource'
         422:
           $ref: '#/responses/UnprocessableEntity'
         429:
@@ -2053,311 +389,68 @@ paths:
           $ref: '#/responses/ServerUnavailable'
 
 definitions:
-
-  User:
-    title: User
+  Product:
+    title: Product
     type: object
     properties:
       id:
         type: string
-        description: A user identifier.
+        description: A product identifier.
         readOnly: true
-      username:
+      name:
         type: string
-        description: Registered username.
+        description: Name.
         readOnly: true
-      firstName:
-        type: string
-        description: First name.
-      lastName:
-        type: string
-        description: Last name.
-      createdOn:
+      price:
         type: integer
-        description: Timestamp when the user was created.
+        description: Price
         readOnly: true
-      updatedOn:
-        type: integer
-        description: Timestamp when the user was last updated.
-        readOnly: true
-      _links:
-        readOnly: true
-        description: A collection of links related to this resource.
-        type: array
-        items:
-          $ref: '#/definitions/Link'
 
-
-  Ticket:
-    title: Ticket
+  Order:
+    title: Order
     type: object
     properties:
       id:
         type: string
-        description: A ticket identifier.
+        description: An order identifier.
         readOnly: true
-      author:
-        type: string
-        description: Person who created the ticket.
-        readOnly: true
-      organizationId:
-        type: string
-        description: The organization where the ticket belongs.
-        readOnly: true
-      teamId:
-        type: string
-        description: The team where the ticket belongs.
-      title:
-        type: string
-        description: Title of the ticket.
-      description:
-        type: string
-        description: Description of the ticket.
-      owner:
-        type: string
-        description: Person who is assigned to the ticket.
-      category:
-        type: string
-        description: Category of the ticket.
-      type:
-        type: string
-        description: Type of the ticket.
-        enum:
-          - "Bug"
-          - "Feature Request"
-          - "Inquiry"
-      priority:
-        type: string
-        description: Priority of the ticket.
-        enum:
-          - "Low"
-          - "Normal"
-          - "High"
-          - "Critical"
       status:
         type: string
-        description: Status of the ticket.
-        enum:
-          - "Open"
-          - "On Going"
-          - "Closed"
-      archived:
-        type: boolean
-        description: True if the ticket is archived.
-      tags:
+        description: The order status.
+        readOnly: true
+      customerId:
+        type: string
+        description: A customer identifier.
+        readOnly: true
+      postedOn:
+        type: integer
+        description: Timestamp when the order is placed.
+        readOnly: true
+      lastUpdatedOn:
+        type: integer
+        description: Timestamp when the order was last updated.
+        readOnly: true
+      items:
         type: array
         items:
-          type: string
-      createdOn:
-        type: integer
-        description: Timestamp when the ticket was created.
-        readOnly: true
-      updatedOn:
-        type: integer
-        description: Timestamp when the ticket was last updated.
-        readOnly: true
-      _links:
-        readOnly: true
-        description: A collection of links related to this resource.
-        type: array
-        items:
-          $ref: '#/definitions/Link'
-    required:
-      - title
-
-  Task:
-    title: Task
-    type: object
-    properties:
-      id:
-        type: string
-        description: A task identifier.
-        readOnly: true
-      author:
-        type: string
-        description: Person who created the task.
-        readOnly: true
-      name:
-        type: string
-        description: Task name.
-      owner:
-        type: string
-        description: Person who is assigned to the task.
-      color:
-        type: string
-        description: Task color.
-      pinned:
-        type: boolean
-        description: True if the task is pinned.
-      completed:
-        type: boolean
-        description: True if the task is completed.
-      archived:
-        type: boolean
-        description: True if the task is archived.
-      tags:
-        type: array
-        items:
-          type: string
-      createdOn:
-        type: integer
-        description: Timestamp when the task was created.
-        readOnly: true
-      updatedOn:
-        type: integer
-        description: Timestamp when the task was last updated.
-        readOnly: true
-      _links:
-        readOnly: true
-        description: A collection of links related to this resource.
-        type: array
-        items:
-          $ref: '#/definitions/Link'
-    required:
-      - name
-
-  Attachment:
-    title: File Attachment
-    type: object
-    properties:
-      id:
-        type: string
-        description: A attachment identifier.
-        readOnly: true
-      uploader:
-        type: string
-        description: Person who uploaded the file.
-        readOnly: true
-      name:
-        type: string
-        description: Attachment file name.
-      type:
-        type: string
-        description: Attachment file type.
-        readOnly: true
-      size:
-        type: integer
-        description: Attachment size in bytes.
-        readOnly: true
-      tags:
-        type: array
-        items:
-          type: string
-      createdOn:
-        type: integer
-        description: Timestamp when the attachment was uploaded.
-        readOnly: true
-      _links:
-        readOnly: true
-        description: A collection of links related to this resource.
-        type: array
-        items:
-          $ref: '#/definitions/Link'
-    required:
-      - name
-      - content
-
-  Message:
-    title: Message
-    type: object
-    properties:
-      id:
-        type: string
-        description: A attachment identifier.
-        readOnly: true
-      conversationId:
-        type: string
-        description: The conversation where the message belongs.
-        readOnly: true
-      author:
-        type: string
-        description: Person who wrote the message.
-        readOnly: true
-      content:
-        type: string
-        description: Message content.
-      createdOn:
-        type: integer
-        description: Timestamp when the attachment was uploaded.
-        readOnly: true
-      updatedOn:
-        type: integer
-        description: Timestamp when the task was last updated.
-        readOnly: true
-      _links:
-        readOnly: true
-        description: A collection of links related to this resource.
-        type: array
-        items:
-          $ref: '#/definitions/Link'
-    required:
-      - name
-      - content
-
-
-  Event:
-    title: Event
-    type: object
-    properties:
-      id:
-        type: string
-        description: A event identifier.
-        readOnly: true
-      name:
-        type: string
-        description: Name of the event.
-        readOnly: true
-      description:
-        type: string
-        description: Description of the event.
-        readOnly: true
-      raisedBy:
-        type: string
-        description: Person who raised the event.
-        readOnly: true
-      happenedOn:
-        type: integer
-        description: Timestamp when the event happened.
-        readOnly: true
-
-  Meta:
-    title: Collection Meta Data
-    type: object
-    properties:
-      count:
-        type: integer
-        readOnly: true
-        description: Number of resources in the page.
-      total:
-        type: integer
-        readOnly: true
-        description: Total number of resources in the collection.
-      pages:
-        type: integer
-        readOnly: true
-        description: Total number of pages in the collection.
-      size:
-        type: integer
-        readOnly: true
-        description: Maximum number of resources allowed per page.
-
-  Link:
-    title: Link
-    type: object
-    readOnly: true
-    properties:
-      rel:
-        type: string
-        description: Relation of the link to the current resource or collection.
-        readOnly: true
-      href:
-        type: string
-        description: The URL of the link.
-        readOnly: true
-      title:
-        type: string
-        description: The name or title of this link.
-        readOnly: true
+          type: object
+          properties:
+            id:
+              type: string
+              description: An item identifier.
+              readOnly: true
+            productId:
+              type: string
+              description: A product identifier.
+              readOnly: true
+            price:
+              type: string
+              description: The price of the purchased item.
+              readOnly: true
+            quantity:
+              type: string
+              description: Number of items purchased.
+              readOnly: true
 
   Error:
     type: object

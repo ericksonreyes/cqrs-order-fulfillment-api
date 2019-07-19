@@ -36,9 +36,10 @@ interface OrderInterface
 
     /**
      * @param string $createdBy
+     * @param string $customerId
      * @param array $items
      */
-    public function create(string $createdBy, array $items): void;
+    public function create(string $createdBy, string $customerId, array $items): void;
 
     /**
      * @param string $acceptedBy

@@ -13,15 +13,19 @@ use EricksonReyes\DomainDrivenDesign\Domain\Event;
  */
 class OrderWasCancelled implements Event
 {
+    /**
+     * @var string
+     */
+    protected $reason;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $raisedBy;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $entityId;
 
     /**
@@ -29,7 +33,6 @@ class OrderWasCancelled implements Event
      */
     protected $happenedOn;
 
-    
 
     /**
      * OrderWasCancelled constructor.
@@ -40,20 +43,23 @@ class OrderWasCancelled implements Event
 
     /**
      * @param string $raisedBy
-     * @param string $entityId 
+     * @param string $entityId
+     * @param string $reason
      * @return OrderWasCancelled
      * @throws \Exception
      */
     public static function raise(
         string $raisedBy,
-        string $entityId
-    ): self {
+        string $entityId,
+        string $reason
+    ): self
+    {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();
         $event->raisedBy = $raisedBy;
-        $event->entityId = $entityId; 
-
+        $event->entityId = $entityId;
+        $event->reason = $reason;
         return $event;
     }
 
@@ -125,11 +131,20 @@ class OrderWasCancelled implements Event
     /**
      * @return string
      */
+    public function reason(): string
+    {
+        return $this->reason;
+    }
+
+
+    /**
+     * @return string
+     */
     public static function staticEventName(): string
     {
         return 'OrderWasCancelled';
     }
-    
+
 
     /**
      * @return array
@@ -142,8 +157,9 @@ class OrderWasCancelled implements Event
             'entityType' => $this->entityType(),
             'entityId' => $this->entityId(),
             'data' => [
+                'reason' => $this->reason(),
                 'raisedBy' => $this->raisedBy(),
-                'entityId' => $this->entityId(), 
+                'entityId' => $this->entityId(),
             ]
         ];
     }
@@ -157,7 +173,8 @@ class OrderWasCancelled implements Event
         $event = new static();
         $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
         $event->raisedBy = $array['data']['raisedBy'];
-        $event->entityId = $array['data']['entityId']; 
+        $event->entityId = $array['data']['entityId'];
+        $event->reason = $array['data']['reason'];
         return $event;
     }
 }

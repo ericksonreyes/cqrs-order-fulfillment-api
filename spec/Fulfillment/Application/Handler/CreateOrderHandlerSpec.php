@@ -6,6 +6,7 @@ use Faker\Factory;
 use Faker\Generator;
 use Fulfillment\Application\CreateOrder;
 use Fulfillment\Application\Handler\CreateOrderHandler;
+use Fulfillment\Domain\Model\Order\Exceptions\DuplicateOrderIdError;
 use Fulfillment\Domain\Model\Order\OrderInterface;
 use Fulfillment\Domain\Model\Order\Repository\OrderRepository;
 use PhpSpec\ObjectBehavior;
@@ -54,6 +55,12 @@ class CreateOrderHandlerSpec extends ObjectBehavior
         $this->handleThis($command)->shouldBeNull();
     }
 
+    public function it_stops_when_the_order_does_not_exist(CreateOrder $command, OrderInterface $duplicateOrder)
+    {
+        $command->orderId()->shouldBeCalled()->willReturn($orderId = $this->seeder->uuid);
+        $this->expectedRepository->findById($orderId)->shouldBeCalled()->willReturn($duplicateOrder);
+        $this->shouldThrow(DuplicateOrderIdError::class)->during('handleThis', [$command]);
+    }
 
     public function it_has_repository()
     {

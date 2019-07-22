@@ -6,6 +6,7 @@ use Faker\Factory;
 use Faker\Generator;
 use Fulfillment\Application\CloseOrder;
 use Fulfillment\Application\Handler\CloseOrderHandler;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderNotFoundError;
 use Fulfillment\Domain\Model\Order\OrderInterface;
 use Fulfillment\Domain\Model\Order\Repository\OrderRepository;
 use PhpSpec\ObjectBehavior;
@@ -53,6 +54,12 @@ class CloseOrderHandlerSpec extends ObjectBehavior
         $this->handleThis($command)->shouldBeNull();
     }
 
+    public function it_stops_when_the_order_does_not_exist(CloseOrder $command)
+    {
+        $command->orderId()->shouldBeCalled()->willReturn($orderId = $this->seeder->uuid);
+        $this->expectedRepository->findById($orderId)->shouldBeCalled()->willReturn(null);
+        $this->shouldThrow(OrderNotFoundError::class)->during('handleThis', [$command]);
+    }
 
     public function it_has_repository()
     {

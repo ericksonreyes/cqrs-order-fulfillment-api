@@ -1,0 +1,3 @@
+services:
+  code_generator:
+    class: App\Services\LaravelVerificationCodeGenerator

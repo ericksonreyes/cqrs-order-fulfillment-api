@@ -1,0 +1,565 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API"
+  description: "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API"
+  contact:
+    email: "ercbluemonday@yahoo.com"
+host: "localhost:8000"
+basePath: "/v1/api/"
+schemes:
+  - "http"
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: Employee
+    description: The employee who will be using this REST API.
+  - name: Product
+    description: The product we are selling.
+  - name: Order
+    description: The existing customer orders.
+
+paths:
+  /auth:
+    post:
+      tags:
+        - Employee
+      summary: Employee authentication.
+      description: API for authenticating customers. Default username is "employee" and password is "password"
+      operationId: authenticateEmployee
+      parameters:
+        - name: body
+          description: Employee login credentials
+          in: body
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - username
+              - password
+      responses:
+        200:
+          description: Employee authenticated.
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+        403:
+          $ref: '#/responses/AccessDenied'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /orders:
+    get:
+      tags:
+        - Order
+      summary: Customer Orders.
+      description: API for getting all the customer's orders.
+      operationId: getAllCustomerOrders
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: A collection of customer's orders.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Order'
+        400:
+          $ref: '#/responses/BadRequest'
+        402:
+          $ref: '#/responses/PaidOperation'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/UnauthorizedRequest'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        410:
+          $ref: '#/responses/DeletedResource'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /orders/{id}:
+    get:
+      tags:
+        - Order
+      summary: Get one order.
+      description: API for getting one order.
+      operationId: getOneOrder
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: An order identifier.
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: "An existing order."
+          schema:
+            $ref: '#/definitions/Order'
+        304:
+          $ref: '#/responses/NotModified'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/AccessDenied'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /orders/{id}/accept:
+    put:
+      tags:
+        - Order
+      summary: Marks an order as accepted.
+      description: API for accepting an order.
+      operationId: acceptOrder
+      parameters:
+        - name: id
+          description: An order identifier.
+          in: path
+          required: true
+          type: string
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          $ref: '#/responses/RequestPerformed'
+        400:
+          $ref: '#/responses/BadRequest'
+        402:
+          $ref: '#/responses/PaidOperation'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/UnauthorizedRequest'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        410:
+          $ref: '#/responses/DeletedResource'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /orders/{id}/ship:
+    put:
+      tags:
+        - Order
+      summary: Marks an order as shipped.
+      description: API for shipping an order.
+      operationId: shipOrder
+      parameters:
+        - name: id
+          description: An order identifier.
+          in: path
+          required: true
+          type: string
+        - name: body
+          description: The shipping details
+          in: body
+          schema:
+            type: object
+            properties:
+              shipper:
+                type: string
+              trackingId:
+                type: string
+              dateShipped:
+                type: integer
+            required:
+              - trackinId
+              - shipper
+              - dateShipped
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          $ref: '#/responses/RequestPerformed'
+        400:
+          $ref: '#/responses/BadRequest'
+        402:
+          $ref: '#/responses/PaidOperation'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/UnauthorizedRequest'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        410:
+          $ref: '#/responses/DeletedResource'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /orders/{id}/complete:
+    put:
+      tags:
+        - Order
+      summary: Marks an order as complete.
+      description: API for completing an order.
+      operationId: completeOrder
+      parameters:
+        - name: id
+          description: An order identifier.
+          in: path
+          required: true
+          type: string
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          $ref: '#/responses/RequestPerformed'
+        400:
+          $ref: '#/responses/BadRequest'
+        402:
+          $ref: '#/responses/PaidOperation'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/UnauthorizedRequest'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        410:
+          $ref: '#/responses/DeletedResource'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /orders/{id}/cancel:
+    put:
+      tags:
+        - Order
+      summary: Marks an order as cancelled.
+      description: API for cancelling an order.
+      operationId: cancelOrder
+      parameters:
+        - name: id
+          description: An order identifier.
+          in: path
+          required: true
+          type: string
+        - name: body
+          description: The cancellation details
+          in: body
+          schema:
+            type: object
+            properties:
+              reason:
+                type: string
+            required:
+              - reason
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          $ref: '#/responses/RequestPerformed'
+        400:
+          $ref: '#/responses/BadRequest'
+        402:
+          $ref: '#/responses/PaidOperation'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/UnauthorizedRequest'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        410:
+          $ref: '#/responses/DeletedResource'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /products:
+    get:
+      tags:
+        - Product
+      summary: Get all our products.
+      description: API for getting all products.
+      operationId: getAllProducts
+      responses:
+        200:
+          description: Collection of our existing products.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        304:
+          $ref: '#/responses/NotModified'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/AccessDenied'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+  /products/{id}:
+    get:
+      tags:
+        - Product
+      summary: Get one product.
+      description: API for getting one product.
+      operationId: getOneProduct
+      parameters:
+        - name: id
+          description: A product unique identifier.
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: ""
+          schema:
+            $ref: '#/definitions/Product'
+        304:
+          $ref: '#/responses/NotModified'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/ExpiredSession'
+        403:
+          $ref: '#/responses/AccessDenied'
+        404:
+          $ref: '#/responses/ResourceNotFound'
+        422:
+          $ref: '#/responses/UnprocessableEntity'
+        429:
+          $ref: '#/responses/TooManyRequests'
+        500:
+          $ref: '#/responses/ServerError'
+        503:
+          $ref: '#/responses/ServerUnavailable'
+
+definitions:
+  Product:
+    title: Product
+    type: object
+    properties:
+      id:
+        type: string
+        description: A product identifier.
+        readOnly: true
+      name:
+        type: string
+        description: Name.
+        readOnly: true
+      price:
+        type: integer
+        description: Price
+        readOnly: true
+
+  Order:
+    title: Order
+    type: object
+    properties:
+      id:
+        type: string
+        description: An order identifier.
+        readOnly: true
+      status:
+        type: string
+        description: The order status.
+        readOnly: true
+      customerId:
+        type: string
+        description: A customer identifier.
+        readOnly: true
+      postedOn:
+        type: integer
+        description: Timestamp when the order is placed.
+        readOnly: true
+      lastUpdatedOn:
+        type: integer
+        description: Timestamp when the order was last updated.
+        readOnly: true
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              description: An item identifier.
+              readOnly: true
+            productId:
+              type: string
+              description: A product identifier.
+              readOnly: true
+            price:
+              type: string
+              description: The price of the purchased item.
+              readOnly: true
+            quantity:
+              type: string
+              description: Number of items purchased.
+              readOnly: true
+
+  Error:
+    type: object
+    properties:
+      error:
+        readOnly: true
+        description: Error details.
+        type: array
+        items:
+          type: object
+          title: Error Detail
+          properties:
+            code:
+              type: string
+              description: Error code.
+            message:
+              type: string
+              description: Error message.
+            description:
+              type: string
+              description: Error description.
+            file:
+              type: string
+              description: File name where the error was caught.
+            line:
+              type: string
+              description: Line number where the error was caught.
+
+responses:
+  RequestPerformed: # HTTP 204
+    description: The request was successfully performed.
+  RequestAccepted: # HTTP 202
+    description: The request was accepted.
+
+  ResourceUpdated: # HTTP 204
+    description: The resource was successfully updated.
+  ResourceDeleted: # HTTP 204
+    description: The resource was successfully deleted.
+
+  NotModified: # HTTP 304
+    description: Resource was not modified.
+
+  BadRequest: # HTTP 400
+    description: Invalid, incomplete or malformed request.
+    schema:
+      $ref: '#/definitions/Error'
+  ExpiredSession: # HTTP 401
+    description: User session has expired.
+    schema:
+      $ref: '#/definitions/Error'
+  PaidResource: # HTTP 402
+    description: The resource you are trying to access requires a payment to be settled.
+    schema:
+      $ref: '#/definitions/Error'
+  PaidCollection: # HTTP 402
+    description: The collection you are trying to access requires a payment to be settled.
+    schema:
+      $ref: '#/definitions/Error'
+  PaidOperation: # HTTP 402
+    description: The operation you are trying to perform requires a payment to be settled.
+    schema:
+      $ref: '#/definitions/Error'
+  AccessDenied: # HTTP 403
+    description: User has no permission to access this resource.
+    schema:
+      $ref: '#/definitions/Error'
+  UnauthorizedRequest: # HTTP 403
+    description: User has no permission to perform this request.
+    schema:
+      $ref: '#/definitions/Error'
+  ResourceNotFound: # HTTP 404
+    description: The resource you are trying to access does not exist.
+    schema:
+      $ref: '#/definitions/Error'
+  MethodNotAllowed: # HTTP 405
+    description: The resource is not supporting the HTTP method you are using.
+    schema:
+      $ref: '#/definitions/Error'
+  DeletedResource: # HTTP 410
+    description: The resource you are trying to access was already deleted.
+    schema:
+      $ref: '#/definitions/Error'
+  DuplicateResource: # HTTP 409
+    description: Resource already exists.
+    schema:
+      $ref: '#/definitions/Error'
+  ResourceConflict: # HTTP 409
+    description: There was a conflict encountered when updating the resource.
+    schema:
+      $ref: '#/definitions/Error'
+  UnprocessableEntity: # HTTP 422
+    description: Validation Error.
+    schema:
+      $ref: '#/definitions/Error'
+  TooManyRequests: # HTTP 429
+    description: User has sent too many requests and needed to be throttled.
+    schema:
+      $ref: '#/definitions/Error'
+  ServerError: # HTTP 500
+    description: A server or application error was encountered.
+    schema:
+      $ref: '#/definitions/Error'
+  ServerUnavailable: # HTTP 503
+    description: The server is unavailable at the moment.
+    schema:
+      $ref: '#/definitions/Error'
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header

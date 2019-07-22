@@ -1,0 +1,3 @@
+services:
+  identity_generator:
+    class: App\Services\RamseyIdentityGenerator

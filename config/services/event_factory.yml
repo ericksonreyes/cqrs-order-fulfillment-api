@@ -1,0 +1,5 @@
+services:
+
+  event_factory:
+    factory: ['App\Services\EventFactory', 'loadAllFrom']
+    arguments: ['src/Fulfillment/Domain/Model/Order/Event/']

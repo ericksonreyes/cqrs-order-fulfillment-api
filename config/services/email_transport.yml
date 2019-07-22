@@ -1,0 +1,4 @@
+services:
+  email_transport:
+    class: App\Services\SwiftSmtpEmailTransport
+    arguments: ['%smtp_host%', '%smtp_port%', '%smtp_encryption%']

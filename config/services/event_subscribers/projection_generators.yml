@@ -1,0 +1,9 @@
+services:
+
+  account_projector:
+    class: App\Services\EventSubscribers\ProjectionGenerators\AccountProjectionGenerator
+
+  projection_generators:
+    class: App\Services\EventSubscribers\Projectors
+    calls:
+      - [addProjector, ['@account_projector']]

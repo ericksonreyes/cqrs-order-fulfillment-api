@@ -1,0 +1,3 @@
+services:
+  exception_logger:
+    class: App\Console\Commands\SentryExceptionLogger

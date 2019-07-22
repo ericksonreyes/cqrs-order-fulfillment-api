@@ -1,0 +1,7 @@
+services:
+  event_model:
+    class: App\Models\Command\EventModel
+
+  mysql_event_storage:
+    class: App\Services\EventStorages\MySQL\MySqlEventStorage
+    arguments: ['@event_model', '@event_factory', '@identity_generator']

@@ -1,0 +1,5 @@
+services:
+  command_bus:
+    class: DDDCommon\Helper\CommandBus
+    calls:
+#      - [addHandler, [ Acme\Sales\Application\Customer\SignUpCustomerPartially, '@handler_customer_partial_sign_up']]

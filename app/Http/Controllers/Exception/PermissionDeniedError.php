@@ -14,7 +14,7 @@ use EricksonReyes\DomainDrivenDesign\Common\Exception\PermissionDeniedException;
  * Class PermissionDenied
  * @package App\Http\Controllers\Exception
  */
-class PermissionDenied extends PermissionDeniedException
+class PermissionDeniedError extends PermissionDeniedException
 {
 
 }

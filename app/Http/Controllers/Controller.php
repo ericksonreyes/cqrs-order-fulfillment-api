@@ -28,12 +28,12 @@ abstract class Controller extends BaseController
      * @var array
      */
     private static $exceptionMap = [
-        InvalidArgumentException::class => 400,
         AuthenticationFailureException::class => 401,
         PermissionDeniedException::class => 403,
         RecordNotFoundException::class => 404,
         DeletedRecordException::class => 410,
         RecordConflictException::class => 409,
+        InvalidArgumentException::class => 400,
     ];
 
 

@@ -4,7 +4,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Controllers\Exception\LoginFailedException;
+use App\Http\Controllers\Exception\LoginFailedError;
 use App\Models\Query\Employee;
 use Exception;
 use Firebase\JWT\JWT;
@@ -22,7 +22,7 @@ class AuthenticationController extends Controller
                 ->first();
 
             if (!$employee) {
-                throw new LoginFailedException('Incorrect username or password.');
+                throw new LoginFailedError('Incorrect username or password.');
             }
 
             $key = $this->container()->getParameter('jwt_secret_key');

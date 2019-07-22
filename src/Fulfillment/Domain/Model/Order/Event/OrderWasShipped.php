@@ -3,7 +3,9 @@
 namespace Fulfillment\Domain\Model\Order\Event;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use EricksonReyes\DomainDrivenDesign\Domain\Event;
+use Exception;
 
 /**
  * Class OrderWasShipped
@@ -15,13 +17,13 @@ class OrderWasShipped implements Event
 {
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $raisedBy;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $entityId;
 
     /**
@@ -29,21 +31,18 @@ class OrderWasShipped implements Event
      */
     protected $happenedOn;
 
-    /**
-	/* @var string
-	*/
-	protected $shipper;
-	
-	/**
-	/* @var string
-	*/
-	protected $trackingId;
-	
-	/**
-	/* @var int
-	*/
-	protected $dateShipped;
-	
+    /* @var string
+     */
+    protected $shipper;
+
+    /* @var string
+     */
+    protected $trackingId;
+
+    /* @var int
+     */
+    protected $dateShipped;
+
 
     /**
      * OrderWasShipped constructor.
@@ -54,55 +53,46 @@ class OrderWasShipped implements Event
 
     /**
      * @param string $raisedBy
-     * @param string $entityId 
-	 * @param string $shipper
-	 * @param string $trackingId
-	 * @param int $dateShipped
+     * @param string $entityId
+     * @param string $shipper
+     * @param string $trackingId
+     * @param DateTimeInterface $dateShipped
      * @return OrderWasShipped
-     * @throws \Exception
+     * @throws Exception
      */
     public static function raise(
         string $raisedBy,
-        string $entityId, 
-		string $shipper, 
-		string $trackingId, 
-		int $dateShipped
+        string $entityId,
+        string $shipper,
+        string $trackingId,
+        DateTimeInterface $dateShipped
     ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();
         $event->raisedBy = $raisedBy;
-        $event->entityId = $entityId; 
-		$event->shipper = $shipper;
-		$event->trackingId = $trackingId;
-		$event->dateShipped = $dateShipped;
+        $event->entityId = $entityId;
+        $event->shipper = $shipper;
+        $event->trackingId = $trackingId;
+        $event->dateShipped = $dateShipped;
 
         return $event;
     }
 
     /**
-     * @return string
+     * @param array $array
+     * @return Event
      */
-    public static function staticEntityContext(): string
+    public static function fromArray(array $array): Event
     {
-        return 'Fulfillment';
-    }
-
-    /**
-     * @return string
-     */
-    public static function staticEntityType(): string
-    {
-        return 'Order';
-    }
-
-
-    /**
-     * @return string
-     */
-    public function eventName(): string
-    {
-        return static::staticEventName();
+        $event = new static();
+        $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
+        $event->raisedBy = $array['data']['raisedBy'];
+        $event->entityId = $array['data']['entityId'];
+        $event->shipper = $array['data']['shipper'];
+        $event->trackingId = $array['data']['trackingId'];
+        $event->dateShipped = DateTimeImmutable::createFromFormat('U', (string)$array['data']['dateShipped']);
+        return $event;
     }
 
     /**
@@ -116,69 +106,10 @@ class OrderWasShipped implements Event
     /**
      * @return string
      */
-    public function entityType(): string
+    public static function staticEntityContext(): string
     {
-        return static::staticEntityType();
+        return 'Fulfillment';
     }
-
-    /**
-     * @return DateTimeImmutable
-     */
-    public function happenedOn(): DateTimeImmutable
-    {
-        return $this->happenedOn;
-    }
-
-    /**
-     * @return string
-     */
-    public function raisedBy(): string
-    {
-        return $this->raisedBy;
-    }
-
-    /**
-     * @return string
-     */
-    public function entityId(): string
-    {
-        return $this->entityId;
-    }
-
-    /**
-     * @return string
-     */
-    public static function staticEventName(): string
-    {
-        return 'OrderWasShipped';
-    }
-    
-    /**
-    * @return string
-    */
-    public function shipper(): string
-    {
-        return $this->shipper;
-    }
-
-
-    /**
-    * @return string
-    */
-    public function trackingId(): string
-    {
-        return $this->trackingId;
-    }
-
-
-    /**
-    * @return int
-    */
-    public function dateShipped(): int
-    {
-        return $this->dateShipped;
-    }
-
 
     /**
      * @return array
@@ -192,27 +123,91 @@ class OrderWasShipped implements Event
             'entityId' => $this->entityId(),
             'data' => [
                 'raisedBy' => $this->raisedBy(),
-                'entityId' => $this->entityId(), 
-				'shipper' => $this->shipper(), 
-				'trackingId' => $this->trackingId(), 
-				'dateShipped' => $this->dateShipped()
+                'entityId' => $this->entityId(),
+                'shipper' => $this->shipper(),
+                'trackingId' => $this->trackingId(),
+                'dateShipped' => $this->dateShipped()->getTimestamp()
             ]
         ];
     }
 
     /**
-     * @param array $array
-     * @return Event
+     * @return string
      */
-    public static function fromArray(array $array): Event
+    public function eventName(): string
     {
-        $event = new static();
-        $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
-        $event->raisedBy = $array['data']['raisedBy'];
-        $event->entityId = $array['data']['entityId']; 
-		$event->shipper = $array['data']['shipper'];
-		$event->trackingId = $array['data']['trackingId'];
-		$event->dateShipped = $array['data']['dateShipped'];
-        return $event;
+        return static::staticEventName();
+    }
+
+    /**
+     * @return string
+     */
+    public static function staticEventName(): string
+    {
+        return 'OrderWasShipped';
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function happenedOn(): DateTimeImmutable
+    {
+        return $this->happenedOn;
+    }
+
+    /**
+     * @return string
+     */
+    public function entityType(): string
+    {
+        return static::staticEntityType();
+    }
+
+    /**
+     * @return string
+     */
+    public static function staticEntityType(): string
+    {
+        return 'Order';
+    }
+
+    /**
+     * @return string
+     */
+    public function entityId(): string
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * @return string
+     */
+    public function raisedBy(): string
+    {
+        return $this->raisedBy;
+    }
+
+    /**
+     * @return string
+     */
+    public function shipper(): string
+    {
+        return $this->shipper;
+    }
+
+    /**
+     * @return string
+     */
+    public function trackingId(): string
+    {
+        return $this->trackingId;
+    }
+
+    /**
+     * @return DateTimeInterface
+     */
+    public function dateShipped(): DateTimeInterface
+    {
+        return $this->dateShipped;
     }
 }

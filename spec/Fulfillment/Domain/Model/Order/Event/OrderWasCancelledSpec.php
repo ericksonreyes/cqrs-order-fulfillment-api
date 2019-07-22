@@ -1,11 +1,12 @@
 <?php
+
 namespace spec\Fulfillment\Domain\Model\Order\Event;
 
-use EricksonReyes\DomainDrivenDesign\Domain\Event;
-use Fulfillment\Domain\Model\Order\Event\OrderWasCancelled;
 use DateTimeImmutable;
+use EricksonReyes\DomainDrivenDesign\Domain\Event;
 use Faker\Factory;
 use Faker\Generator;
+use Fulfillment\Domain\Model\Order\Event\OrderWasCancelled;
 use PhpSpec\ObjectBehavior;
 
 class OrderWasCancelledSpec extends ObjectBehavior
@@ -16,16 +17,20 @@ class OrderWasCancelledSpec extends ObjectBehavior
     protected $seeder;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedRaisedBy;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedEntityId;
 
-    
+    /**
+     * @var string
+     */
+    protected $expectedReason;
+
 
     public function __construct()
     {
@@ -38,6 +43,7 @@ class OrderWasCancelledSpec extends ObjectBehavior
         $this->beConstructedThrough('raise', [
             $this->expectedRaisedBy = $this->seeder->uuid,
             $this->expectedEntityId = $this->seeder->uuid,
+            $this->expectedReason = $this->seeder->paragraph
         ]);
     }
 
@@ -71,7 +77,6 @@ class OrderWasCancelledSpec extends ObjectBehavior
         $this->eventName()->shouldReturn('OrderWasCancelled');
     }
 
-    
 
     public function it_has_array_representation()
     {
@@ -85,13 +90,15 @@ class OrderWasCancelledSpec extends ObjectBehavior
             'data' => [
                 'raisedBy' => $expectedRaisedBy = $this->seeder->uuid,
                 'entityId' => $expectedEntityId = $this->seeder->uuid,
+                'reason' => $expectedReason = $this->seeder->paragraph
             ]
         ];
 
         $this::fromArray($array)->shouldHaveType(OrderWasCancelled::class);
         $this::fromArray($array)->happenedOn()->shouldHaveType(DateTimeImmutable::class);
         $this::fromArray($array)->entityId()->shouldReturn($expectedEntityId);
-        
+        $this::fromArray($array)->reason()->shouldReturn($expectedReason);
+
     }
 
 }

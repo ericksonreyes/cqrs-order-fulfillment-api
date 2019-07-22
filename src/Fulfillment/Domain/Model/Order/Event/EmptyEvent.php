@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Fulfillment\Domain\Model\Order\Event;
 
 use DateTimeImmutable;
@@ -7,12 +8,12 @@ use EricksonReyes\DomainDrivenDesign\Domain\Event;
 use Exception;
 
 /**
- * Class OrderWasPlaced
+ * Class EmptyEvent
  * @package Fulfillment\Domain\Model\Order\Event
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OrderWasPlaced implements Event
+abstract class EmptyEvent implements Event
 {
 
     /**
@@ -30,17 +31,9 @@ class OrderWasPlaced implements Event
      */
     protected $happenedOn;
 
-    /* @var string
-     */
-    protected $customerId;
-
-    /* @var array
-     */
-    protected $items;
-
 
     /**
-     * OrderWasPlaced constructor.
+     * OrderWasCompleted constructor.
      */
     public function __construct()
     {
@@ -49,24 +42,18 @@ class OrderWasPlaced implements Event
     /**
      * @param string $raisedBy
      * @param string $entityId
-     * @param string $customerId
-     * @param array $items
-     * @return OrderWasPlaced
+     * @return OrderWasCompleted
      * @throws Exception
      */
     public static function raise(
         string $raisedBy,
-        string $entityId,
-        string $customerId,
-        array $items
+        string $entityId
     ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();
         $event->raisedBy = $raisedBy;
         $event->entityId = $entityId;
-        $event->customerId = $customerId;
-        $event->items = $items;
 
         return $event;
     }
@@ -81,8 +68,6 @@ class OrderWasPlaced implements Event
         $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
         $event->raisedBy = $array['data']['raisedBy'];
         $event->entityId = $array['data']['entityId'];
-        $event->customerId = $array['data']['customerId'];
-        $event->items = $array['data']['items'];
         return $event;
     }
 
@@ -115,8 +100,6 @@ class OrderWasPlaced implements Event
             'data' => [
                 'raisedBy' => $this->raisedBy(),
                 'entityId' => $this->entityId(),
-                'customerId' => $this->customerId(),
-                'items' => $this->items()
             ]
         ];
     }
@@ -129,13 +112,6 @@ class OrderWasPlaced implements Event
         return static::staticEventName();
     }
 
-    /**
-     * @return string
-     */
-    public static function staticEventName(): string
-    {
-        return 'OrderWasPlaced';
-    }
 
     /**
      * @return DateTimeImmutable
@@ -175,21 +151,5 @@ class OrderWasPlaced implements Event
     public function raisedBy(): string
     {
         return $this->raisedBy;
-    }
-
-    /**
-     * @return string
-     */
-    public function customerId(): string
-    {
-        return $this->customerId;
-    }
-
-    /**
-     * @return array
-     */
-    public function items(): array
-    {
-        return $this->items;
     }
 }

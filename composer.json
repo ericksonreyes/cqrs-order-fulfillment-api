@@ -1,6 +1,6 @@
 {
-  "name": "acme/rest-api",
-  "description": "ACME Rest API",
+  "name": "ericksonreyes/cqrs-order-fulfillment-api",
+  "description": "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API",
   "license": "Propriety",
   "type": "project",
   "require": {
@@ -44,7 +44,7 @@
     ],
     "psr-4": {
       "App\\": "app/",
-      "Acme\\": "src/Acme"
+      "Fulfillment\\": "src/Fulfillment"
     },
     "psr-0": {
       "": [

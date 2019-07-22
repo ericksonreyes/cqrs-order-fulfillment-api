@@ -1,13 +1,27 @@
 <?php
+
 namespace spec\Fulfillment\Domain\Model\Order;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use EricksonReyes\DomainDrivenDesign\EventSourcedEntity;
-use Fulfillment\Domain\Model\Order\Order;
-use PhpSpec\Exception\Example\FailureException;
 use Faker\Factory;
 use Faker\Generator;
-use PhpSpec\ObjectBehavior;
+use Fulfillment\Domain\Model\Order\Event\OrderWasAccepted;
+use Fulfillment\Domain\Model\Order\Event\OrderWasCancelled;
+use Fulfillment\Domain\Model\Order\Event\OrderWasCompleted;
+use Fulfillment\Domain\Model\Order\Event\OrderWasPlaced;
+use Fulfillment\Domain\Model\Order\Event\OrderWasShipped;
+use Fulfillment\Domain\Model\Order\Exceptions\AnonymousOrderCommandError;
+use Fulfillment\Domain\Model\Order\Exceptions\EmptyOrderError;
+use Fulfillment\Domain\Model\Order\Exceptions\MissingCustomerIdError;
+use Fulfillment\Domain\Model\Order\Exceptions\MissingShipperError;
+use Fulfillment\Domain\Model\Order\Exceptions\MissingTrackingIdError;
+use Fulfillment\Domain\Model\Order\Order;
+use Fulfillment\Domain\Model\Order\OrderInterface;
 use InvalidArgumentException;
+use PhpSpec\Exception\Example\FailureException;
+use PhpSpec\ObjectBehavior;
 
 class OrderSpec extends ObjectBehavior
 {
@@ -17,35 +31,15 @@ class OrderSpec extends ObjectBehavior
     protected $seeder;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedRaisedBy;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedEntityId;
 
-    /**
-	* @var string
-	*/
-	protected $expectedCustomerId;
-	
-	/**
-	* @var string
-	*/
-	protected $expectedStatus;
-	
-	/**
-	* @var int
-	*/
-	protected $expectedPostedOn;
-	
-	/**
-	* @var array
-	*/
-	protected $expectedItems;
-	
 
     public function __construct()
     {
@@ -56,11 +50,6 @@ class OrderSpec extends ObjectBehavior
     {
         $identifier = $this->seeder->uuid;
         $this->beConstructedWith($this->expectedEntityId = $identifier);
-        
-			$this->expectedCustomerId = $this->seeder->word; 
-			$this->expectedStatus = $this->seeder->word; 
-			$this->expectedPostedOn = $this->seeder->numberBetween(1, 100000); 
-			$this->expectedItems = $this->seeder->paragraphs;
     }
 
     public function it_is_initializable()
@@ -87,30 +76,186 @@ class OrderSpec extends ObjectBehavior
         $this->isDeleted()->shouldReturn(false);
     }
 
-    
-    public function it_has_customerId()
+    public function it_can_be_created()
     {
-        $this->customerId()->shouldReturn($this->expectedCustomerId);
+        $this->create(
+            $createdBy = $this->seeder->uuid,
+            $customerId = $this->seeder->uuid,
+            $items = $this->seeder->paragraphs
+        )->shouldBeNull();
+
+        $this->customerId()->shouldReturn($customerId);
+        $this->items()->shouldReturn($items);
+        $this->postedOn()->shouldHaveType(DateTimeInterface::class);
+        $this->items()->shouldReturn($items);
+
+        $this->status()->shouldReturn(OrderInterface::ORDER_STATUS_PENDING);
+        $this->storedEvents()->shouldHaveInstanceOf(OrderWasPlaced::class);
     }
 
-
-    public function it_has_status()
+    public function it_prevents_missing_created_by()
     {
-        $this->status()->shouldReturn($this->expectedStatus);
+        $this->shouldThrow(
+            AnonymousOrderCommandError::class
+        )->during(
+            'create',
+            [
+                $createdBy = str_repeat(' ', random_int(0, 3)),
+                $customerId = $this->seeder->uuid,
+                $items = $this->seeder->paragraphs
+            ]
+        );
     }
 
-
-    public function it_has_postedOn()
+    public function it_prevents_missing_customer_id()
     {
-        $this->postedOn()->shouldReturn($this->expectedPostedOn);
+        $this->shouldThrow(
+            MissingCustomerIdError::class
+        )->during(
+            'create',
+            [
+                $createdBy = $this->seeder->uuid,
+                $customerId = str_repeat(' ', random_int(0, 3)),
+                $items = $this->seeder->paragraphs
+            ]
+        );
     }
 
-
-    public function it_has_items()
+    public function it_prevents_empty_orders()
     {
-        $this->items()->shouldReturn($this->expectedItems);
+        $this->shouldThrow(
+            EmptyOrderError::class
+        )->during(
+            'create',
+            [
+                $createdBy = $this->seeder->uuid,
+                $customerId = $this->seeder->uuid,
+                $items = []
+            ]
+        );
     }
 
+    public function it_can_be_accepted()
+    {
+        $acceptedBy = $this->seeder->uuid;
+        $this->accept($acceptedBy)->shouldBeNull();
+
+        $this->status()->shouldReturn(OrderInterface::ORDER_STATUS_ACCEPTED);
+        $this->storedEvents()->shouldHaveInstanceOf(OrderWasAccepted::class);
+    }
+
+    public function it_prevents_anonymous_acceptance_of_orders()
+    {
+        $this->shouldThrow(
+            AnonymousOrderCommandError::class
+        )->during(
+            'accept',
+            [
+                $acceptedBy = str_repeat(' ', random_int(0, 3))
+            ]
+        );
+    }
+
+    public function it_can_be_shipped()
+    {
+        $shippedBy = $this->seeder->uuid;
+        $shipper = $this->seeder->uuid;
+        $trackingId = $this->seeder->uuid;
+        $dateShipped = new DateTimeImmutable();
+        $this->ship($shippedBy, $shipper, $trackingId, $dateShipped)->shouldBeNull();
+
+        $this->status()->shouldReturn(OrderInterface::ORDER_STATUS_SHIPPED);
+        $this->storedEvents()->shouldHaveInstanceOf(OrderWasShipped::class);
+    }
+
+    public function it_prevents_anonymous_shipping_of_orders()
+    {
+        $this->shouldThrow(
+            AnonymousOrderCommandError::class
+        )->during(
+            'ship',
+            [
+                $shipping = str_repeat(' ', random_int(0, 3)),
+                $shipper = $this->seeder->uuid,
+                $trackingId = $this->seeder->uuid,
+                $dateShipped = new DateTimeImmutable()
+            ]
+        );
+    }
+
+    public function it_prevents_shipping_without_a_shipper()
+    {
+        $this->shouldThrow(
+            MissingShipperError::class
+        )->during(
+            'ship',
+            [
+                $shipping = $this->seeder->uuid,
+                $shipper = str_repeat(' ', random_int(0, 3)),
+                $trackingId = $this->seeder->uuid,
+                $dateShipped = new DateTimeImmutable()
+            ]
+        );
+    }
+
+    public function it_prevents_shipping_without_a_tracking_id()
+    {
+        $this->shouldThrow(
+            MissingTrackingIdError::class
+        )->during(
+            'ship',
+            [
+                $shipping = $this->seeder->uuid,
+                $shipper = $this->seeder->uuid,
+                $trackingId = str_repeat(' ', random_int(0, 3)),
+                $dateShipped = new DateTimeImmutable()
+            ]
+        );
+    }
+
+    public function it_prevents_anonymous_cancellations()
+    {
+        $this->shouldThrow(
+            AnonymousOrderCommandError::class
+        )->during(
+            'cancel',
+            [
+                $cancelledBy = str_repeat(' ', random_int(0, 3)),
+                $reason = $this->seeder->sentence
+            ]
+        );
+    }
+
+    public function it_prevents_anonymous_closures()
+    {
+        $this->shouldThrow(
+            AnonymousOrderCommandError::class
+        )->during(
+            'close',
+            [
+                $closedBy = str_repeat(' ', random_int(0, 3))
+            ]
+        );
+    }
+
+    public function it_can_be_cancelled()
+    {
+        $cancelledBy = $this->seeder->uuid;
+        $reason = $this->seeder->paragraph;
+        $this->cancel($cancelledBy, $reason)->shouldBeNull();
+
+        $this->status()->shouldReturn(OrderInterface::ORDER_STATUS_CANCELLED);
+        $this->storedEvents()->shouldHaveInstanceOf(OrderWasCancelled::class);
+    }
+
+    public function it_can_be_completed()
+    {
+        $closedBy = $this->seeder->uuid;
+        $this->close($closedBy)->shouldBeNull();
+
+        $this->status()->shouldReturn(OrderInterface::ORDER_STATUS_COMPLETED);
+        $this->storedEvents()->shouldHaveInstanceOf(OrderWasCompleted::class);
+    }
 
     public function getMatchers(): array
     {

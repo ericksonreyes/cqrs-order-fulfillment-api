@@ -2,12 +2,39 @@
 
 namespace Fulfillment\Domain\Model\Order;
 
+use DateTimeInterface;
+
 /**
  * Interface OrderInterface
  * @package Fulfillment\Domain\Model\Order
  */
 interface OrderInterface
 {
+    public const ORDER_STATUS_PENDING = 'Pending';
+
+    public const ORDER_STATUS_ACCEPTED = 'Accepted';
+
+    public const ORDER_STATUS_SHIPPED = 'Shipped';
+
+    public const ORDER_STATUS_CANCELLED = 'Cancelled';
+
+    public const ORDER_STATUS_COMPLETED = 'Completed';
+
+    public const ERROR_EMPTY_ORDER = 'Your order is empty.';
+
+    public const ERROR_MISSING_CUSTOMER_ID = 'Your order has no customer information.';
+
+    public const ERROR_MISSING_CREATED_BY = 'Need to know who created with order.';
+
+    public const ERROR_MISSING_SHIPPED_BY = 'Need to know who shipped this order.';
+
+    public const ERROR_MISSING_SHIPPER = 'Need to know who is the shipper of this order.';
+
+    public const ERROR_MISSING_TRACKING_ID = 'Need to know the tracking identifier of this order.';
+
+    public const ERROR_MISSING_CANCELLED_BY = 'Need to know who cancelled this order.';
+
+    public const ERROR_MISSING_CLOSED_BY = 'Need to know who closed this order.';
 
     /**
      * @return string
@@ -25,9 +52,9 @@ interface OrderInterface
     public function status(): string;
 
     /**
-     * @return int
+     * @return DateTimeInterface
      */
-    public function postedOn(): int;
+    public function postedOn(): DateTimeInterface;
 
     /**
      * @return array
@@ -50,9 +77,9 @@ interface OrderInterface
      * @param string $shippedBy
      * @param string $shipper
      * @param string $trackingId
-     * @param int $dateShipped
+     * @param DateTimeInterface $dateShipped
      */
-    public function ship(string $shippedBy, string $shipper, string $trackingId, int $dateShipped): void;
+    public function ship(string $shippedBy, string $shipper, string $trackingId, DateTimeInterface $dateShipped): void;
 
     /**
      * @param string $cancelledBy

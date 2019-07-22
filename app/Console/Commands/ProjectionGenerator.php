@@ -8,9 +8,9 @@
 
 namespace App\Console\Commands;
 
-class AcmeProjectionGenerator extends RabbitMQDomainEventListener
+class ProjectionGenerator extends RabbitMQDomainEventListener
 {
-    protected $signature = 'acme:sales:listen:projection_generator';
+    protected $signature = 'fulfillment:projection_generator';
 
     protected $description = 'Creates projections from domain events.';
 

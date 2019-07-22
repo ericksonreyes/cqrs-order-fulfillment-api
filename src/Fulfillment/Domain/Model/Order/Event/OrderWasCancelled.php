@@ -4,6 +4,7 @@ namespace Fulfillment\Domain\Model\Order\Event;
 
 use DateTimeImmutable;
 use EricksonReyes\DomainDrivenDesign\Domain\Event;
+use Exception;
 
 /**
  * Class OrderWasCancelled
@@ -46,14 +47,13 @@ class OrderWasCancelled implements Event
      * @param string $entityId
      * @param string $reason
      * @return OrderWasCancelled
-     * @throws \Exception
+     * @throws Exception
      */
     public static function raise(
         string $raisedBy,
         string $entityId,
         string $reason
-    ): self
-    {
+    ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();
@@ -64,28 +64,17 @@ class OrderWasCancelled implements Event
     }
 
     /**
-     * @return string
+     * @param array $array
+     * @return Event
      */
-    public static function staticEntityContext(): string
+    public static function fromArray(array $array): Event
     {
-        return 'Fulfillment';
-    }
-
-    /**
-     * @return string
-     */
-    public static function staticEntityType(): string
-    {
-        return 'Order';
-    }
-
-
-    /**
-     * @return string
-     */
-    public function eventName(): string
-    {
-        return static::staticEventName();
+        $event = new static();
+        $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
+        $event->raisedBy = $array['data']['raisedBy'];
+        $event->entityId = $array['data']['entityId'];
+        $event->reason = $array['data']['reason'];
+        return $event;
     }
 
     /**
@@ -99,52 +88,10 @@ class OrderWasCancelled implements Event
     /**
      * @return string
      */
-    public function entityType(): string
+    public static function staticEntityContext(): string
     {
-        return static::staticEntityType();
+        return 'Fulfillment';
     }
-
-    /**
-     * @return DateTimeImmutable
-     */
-    public function happenedOn(): DateTimeImmutable
-    {
-        return $this->happenedOn;
-    }
-
-    /**
-     * @return string
-     */
-    public function raisedBy(): string
-    {
-        return $this->raisedBy;
-    }
-
-    /**
-     * @return string
-     */
-    public function entityId(): string
-    {
-        return $this->entityId;
-    }
-
-    /**
-     * @return string
-     */
-    public function reason(): string
-    {
-        return $this->reason;
-    }
-
-
-    /**
-     * @return string
-     */
-    public static function staticEventName(): string
-    {
-        return 'OrderWasCancelled';
-    }
-
 
     /**
      * @return array
@@ -165,16 +112,66 @@ class OrderWasCancelled implements Event
     }
 
     /**
-     * @param array $array
-     * @return Event
+     * @return string
      */
-    public static function fromArray(array $array): Event
+    public function eventName(): string
     {
-        $event = new static();
-        $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
-        $event->raisedBy = $array['data']['raisedBy'];
-        $event->entityId = $array['data']['entityId'];
-        $event->reason = $array['data']['reason'];
-        return $event;
+        return static::staticEventName();
+    }
+
+    /**
+     * @return string
+     */
+    public static function staticEventName(): string
+    {
+        return 'OrderWasCancelled';
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function happenedOn(): DateTimeImmutable
+    {
+        return $this->happenedOn;
+    }
+
+    /**
+     * @return string
+     */
+    public function entityType(): string
+    {
+        return static::staticEntityType();
+    }
+
+    /**
+     * @return string
+     */
+    public static function staticEntityType(): string
+    {
+        return 'Order';
+    }
+
+    /**
+     * @return string
+     */
+    public function entityId(): string
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * @return string
+     */
+    public function reason(): string
+    {
+        return $this->reason;
+    }
+
+    /**
+     * @return string
+     */
+    public function raisedBy(): string
+    {
+        return $this->raisedBy;
     }
 }

@@ -4,7 +4,7 @@ info:
   title: "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API"
   description: "CQRS, Domain-Driven Design & Event Sourcing Inspired Order Fulfillment API"
   contact:
-    email: "support@acme.com"
+    email: "ercbluemonday@yahoo.com"
 host: "localhost:8000"
 basePath: "/v1/api/"
 schemes:

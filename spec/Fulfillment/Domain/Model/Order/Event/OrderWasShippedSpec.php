@@ -1,11 +1,13 @@
 <?php
+
 namespace spec\Fulfillment\Domain\Model\Order\Event;
 
-use EricksonReyes\DomainDrivenDesign\Domain\Event;
-use Fulfillment\Domain\Model\Order\Event\OrderWasShipped;
 use DateTimeImmutable;
+use DateTimeInterface;
+use EricksonReyes\DomainDrivenDesign\Domain\Event;
 use Faker\Factory;
 use Faker\Generator;
+use Fulfillment\Domain\Model\Order\Event\OrderWasShipped;
 use PhpSpec\ObjectBehavior;
 
 class OrderWasShippedSpec extends ObjectBehavior
@@ -16,30 +18,30 @@ class OrderWasShippedSpec extends ObjectBehavior
     protected $seeder;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedRaisedBy;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedEntityId;
 
     /**
-	* @var string
-	*/
-	protected $expectedShipper;
-	
-	/**
-	* @var string
-	*/
-	protected $expectedTrackingId;
-	
-	/**
-	* @var int
-	*/
-	protected $expectedDateShipped;
-	
+     * @var string
+     */
+    protected $expectedShipper;
+
+    /**
+     * @var string
+     */
+    protected $expectedTrackingId;
+
+    /**
+     * @var DateTimeInterface
+     */
+    protected $expectedDateShipped;
+
 
     public function __construct()
     {
@@ -52,9 +54,9 @@ class OrderWasShippedSpec extends ObjectBehavior
         $this->beConstructedThrough('raise', [
             $this->expectedRaisedBy = $this->seeder->uuid,
             $this->expectedEntityId = $this->seeder->uuid,
-			$this->expectedShipper = $this->seeder->word, 
-			$this->expectedTrackingId = $this->seeder->word, 
-			$this->expectedDateShipped = $this->seeder->numberBetween(1, 100000)
+            $this->expectedShipper = $this->seeder->word,
+            $this->expectedTrackingId = $this->seeder->word,
+            $this->expectedDateShipped = new DateTimeImmutable()
         ]);
     }
 
@@ -88,7 +90,7 @@ class OrderWasShippedSpec extends ObjectBehavior
         $this->eventName()->shouldReturn('OrderWasShipped');
     }
 
-    
+
     public function it_has_shipper()
     {
         $this->shipper()->shouldReturn($this->expectedShipper);
@@ -119,9 +121,9 @@ class OrderWasShippedSpec extends ObjectBehavior
             'data' => [
                 'raisedBy' => $expectedRaisedBy = $this->seeder->uuid,
                 'entityId' => $expectedEntityId = $this->seeder->uuid,
-				'shipper' => $expectedShipper = $this->seeder->word, 
-				'trackingId' => $expectedTrackingId = $this->seeder->word, 
-				'dateShipped' => $expectedDateShipped = $this->seeder->numberBetween(1, 100000)
+                'shipper' => $expectedShipper = $this->seeder->word,
+                'trackingId' => $expectedTrackingId = $this->seeder->word,
+                'dateShipped' => $expectedDateShipped = (new DateTimeImmutable())->getTimestamp()
             ]
         ];
 
@@ -129,8 +131,8 @@ class OrderWasShippedSpec extends ObjectBehavior
         $this::fromArray($array)->happenedOn()->shouldHaveType(DateTimeImmutable::class);
         $this::fromArray($array)->entityId()->shouldReturn($expectedEntityId);
         $this::fromArray($array)->shipper()->shouldReturn($expectedShipper);
-		$this::fromArray($array)->trackingId()->shouldReturn($expectedTrackingId);
-		$this::fromArray($array)->dateShipped()->shouldReturn($expectedDateShipped);
+        $this::fromArray($array)->trackingId()->shouldReturn($expectedTrackingId);
+        $this::fromArray($array)->dateShipped()->shouldHaveType(DateTimeInterface::class);
     }
 
 }

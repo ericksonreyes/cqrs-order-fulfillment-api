@@ -2,6 +2,4 @@ services:
 
   event_factory:
     factory: ['App\Services\EventFactory', 'loadAllFrom']
-    arguments: ['src/Acme/Banking/Domain/Model/Account/Event/']
-    calls:
-#      - [loadMoreFrom, ['src/Acme/Banking/Domain/Model/Stocks/Event/']]
+    arguments: ['src/Fulfillment/Domain/Model/Order/Event/']

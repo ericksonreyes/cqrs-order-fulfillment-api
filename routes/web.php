@@ -44,8 +44,8 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
         /**
          * Orders
          */
-        $router->post('/orders', 'OrdersController@findAll');
-        $router->post('/orders/{id}', 'OrdersController@findOne');
+        $router->get('/orders', 'OrdersController@findAll');
+        $router->get('/orders/{id}', 'OrdersController@findOne');
         $router->put('/orders/{id}/accept', 'OrdersController@accept');
         $router->put('/orders/{id}/ship', 'OrdersController@ship');
         $router->put('/orders/{id}/cancel', 'OrdersController@cancel');

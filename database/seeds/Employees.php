@@ -15,7 +15,7 @@ class Employees extends Seeder
         $employees = [
             [
                 'id' => 'employee-1',
-                'username' => 'salesperson',
+                'username' => 'employee',
                 'password' => md5('password')
             ]
         ];

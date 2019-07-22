@@ -24,7 +24,7 @@ class EventModel extends Model
     /**
      * @var string
      */
-    protected $table = 'sales_events';
+    protected $table = 'events';
 
     /**
      * The "booting" method of the model.

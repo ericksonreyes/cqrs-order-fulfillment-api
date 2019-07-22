@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Account
  * @package App\Models\Query
  */
-class Account extends Model
+class Employee extends Model
 {
 
 }

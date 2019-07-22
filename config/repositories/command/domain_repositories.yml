@@ -1,4 +1,6 @@
 services:
-  account_repository:
-    class: App\Repositories\Command\EventSourcedAccountRepository
-    arguments: ['@event_store']
+  order_repository:
+    class: App\Repositories\Command\EventSourcedOrderRepository
+    arguments: ['@mysql_event_storage']
+    calls:
+      - [registerEventPublisher, [ '@rabbitmq_event_publisher']]

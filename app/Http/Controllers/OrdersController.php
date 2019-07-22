@@ -6,6 +6,10 @@ use App\Http\Controllers\Exception\OrderNotFoundError;
 use App\Models\Query\Order;
 use App\Models\Query\OrderItem;
 use Exception;
+use Fulfillment\Application\AcceptOrder;
+use Fulfillment\Application\CancelOrder;
+use Fulfillment\Application\CloseOrder;
+use Fulfillment\Application\ShipOrder;
 use Illuminate\Http\Request;
 
 
@@ -99,10 +103,15 @@ class OrdersController extends Controller
         }
     }
 
-    public function accept(Request $request, string $id)
+    public function accept(string $id)
     {
-
         try {
+            $command = new AcceptOrder(
+                $this->currentlyLoggedInUser(),
+                $id
+            );
+            $this->handler()->execute($command);
+
             return $this->response(
                 [],
                 204
@@ -115,6 +124,15 @@ class OrdersController extends Controller
     public function ship(Request $request, string $id)
     {
         try {
+            $command = new ShipOrder(
+                $this->currentlyLoggedInUser(),
+                $id,
+                $request->get('shipper'),
+                $request->get('trackingId'),
+                $request->get('dateShipped')
+            );
+            $this->handler()->execute($command);
+
             return $this->response(
                 [],
                 204
@@ -127,8 +145,14 @@ class OrdersController extends Controller
 
     public function cancel(Request $request, string $id)
     {
-
         try {
+            $command = new CancelOrder(
+                $this->currentlyLoggedInUser(),
+                $id,
+                $request->get('reason')
+            );
+            $this->handler()->execute($command);
+
             return $this->response(
                 [],
                 204
@@ -144,9 +168,15 @@ class OrdersController extends Controller
      * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \ReflectionException
      */
-    public function complete(Request $request, string $id)
+    public function complete(string $id)
     {
         try {
+            $command = new CloseOrder(
+                $this->currentlyLoggedInUser(),
+                $id
+            );
+            $this->handler()->execute($command);
+
             return $this->response(
                 [],
                 204

@@ -1,0 +1,20 @@
+services:
+  create_order_handler:
+    class: Fulfillment\Application\Handler\CreateOrderHandler
+    arguments: ['@order_repository']
+
+  accept_order_handler:
+    class: Fulfillment\Application\Handler\AcceptOrderHandler
+    arguments: ['@order_repository']
+
+  cancel_order_handler:
+    class: Fulfillment\Application\Handler\CancelOrderHandler
+    arguments: ['@order_repository']
+
+  close_order_handler:
+    class: Fulfillment\Application\Handler\CloseOrderHandler
+    arguments: ['@order_repository']
+
+  ship_order_handler:
+    class: Fulfillment\Application\Handler\ShipOrderHandler
+    arguments: ['@order_repository']

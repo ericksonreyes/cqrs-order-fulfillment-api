@@ -5,12 +5,9 @@ namespace App\Http\Middleware;
 use Closure;
 use Exception;
 use Firebase\JWT\JWT;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
-use InvalidArgumentException;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Authenticate
 {
@@ -35,11 +32,6 @@ class Authenticate
     {
         $this->auth = $auth;
         $this->container = $container;
-    }
-
-    private function container(): ContainerInterface
-    {
-        return $this->container;
     }
 
     /**
@@ -94,5 +86,10 @@ class Authenticate
             ],
             401
         );
+    }
+
+    private function container(): ContainerInterface
+    {
+        return $this->container;
     }
 }

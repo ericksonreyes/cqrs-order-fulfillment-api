@@ -38,7 +38,7 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
         /**
          * Products
          */
-        $router->post('/products', 'ProductsController@findAll');
+        $router->get('/products', 'ProductsController@findAll');
         $router->post('/products/$id', 'ProductsController@findOne');
 
         /**

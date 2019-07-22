@@ -1,11 +1,12 @@
 <?php
+
 namespace spec\Fulfillment\Application;
 
-use Fulfillment\Application\CreateOrder;
 use Faker\Factory;
 use Faker\Generator;
-use PhpSpec\ObjectBehavior;
+use Fulfillment\Application\CreateOrder;
 use InvalidArgumentException;
+use PhpSpec\ObjectBehavior;
 
 
 class CreateOrderSpec extends ObjectBehavior
@@ -16,25 +17,25 @@ class CreateOrderSpec extends ObjectBehavior
     protected $seeder;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedInvoker;
 
     /**
-	* @var string
-	*/
-	protected $expectedOrderId;
-	
-	/**
-	* @var string
-	*/
-	protected $expectedCustomerId;
-	
-	/**
-	* @var array
-	*/
-	protected $expectedItems;
-	
+     * @var string
+     */
+    protected $expectedOrderId;
+
+    /**
+     * @var string
+     */
+    protected $expectedCustomerId;
+
+    /**
+     * @var array
+     */
+    protected $expectedItems;
+
 
     public function __construct()
     {
@@ -45,10 +46,10 @@ class CreateOrderSpec extends ObjectBehavior
     {
         $invoker = $this->seeder->uuid;
         $this->beConstructedWith(
-            $this->expectedInvoker = $invoker, 
-			$this->expectedOrderId = $this->seeder->word, 
-			$this->expectedCustomerId = $this->seeder->word, 
-			$this->expectedItems = $this->seeder->paragraphs
+            $this->expectedInvoker = $invoker,
+            $this->expectedOrderId = $this->seeder->word,
+            $this->expectedCustomerId = $this->seeder->word,
+            $this->expectedItems = $this->seeder->paragraphs
         );
     }
 
@@ -61,10 +62,10 @@ class CreateOrderSpec extends ObjectBehavior
     {
         $invoker = str_repeat(' ', mt_rand(1, 10));
         $this->shouldThrow(InvalidArgumentException::class)->during('__construct', [
-            $invoker, 
-			$this->expectedOrderId = $this->seeder->word, 
-			$this->expectedCustomerId = $this->seeder->word, 
-			$this->expectedItems = $this->seeder->paragraphs
+            $invoker,
+            $this->expectedOrderId = $this->seeder->word,
+            $this->expectedCustomerId = $this->seeder->word,
+            $this->expectedItems = $this->seeder->paragraphs
         ]);
     }
 
@@ -73,20 +74,20 @@ class CreateOrderSpec extends ObjectBehavior
         $this->invoker()->shouldReturn($this->expectedInvoker);
     }
 
-    
-    public function it_has_orderId()
+
+    public function it_has_an_order_identifier()
     {
         $this->orderId()->shouldReturn($this->expectedOrderId);
     }
 
 
-    public function it_has_customerId()
+    public function it_has_a_customer_id()
     {
         $this->customerId()->shouldReturn($this->expectedCustomerId);
     }
 
 
-    public function it_has_items()
+    public function it_has_order_items()
     {
         $this->items()->shouldReturn($this->expectedItems);
     }

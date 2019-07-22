@@ -1,11 +1,12 @@
 <?php
+
 namespace spec\Fulfillment\Application;
 
-use Fulfillment\Application\AcceptOrder;
 use Faker\Factory;
 use Faker\Generator;
-use PhpSpec\ObjectBehavior;
+use Fulfillment\Application\AcceptOrder;
 use InvalidArgumentException;
+use PhpSpec\ObjectBehavior;
 
 
 class AcceptOrderSpec extends ObjectBehavior
@@ -16,15 +17,15 @@ class AcceptOrderSpec extends ObjectBehavior
     protected $seeder;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedInvoker;
 
     /**
-	* @var string
-	*/
-	protected $expectedOrderId;
-	
+     * @var string
+     */
+    protected $expectedOrderId;
+
 
     public function __construct()
     {
@@ -35,8 +36,8 @@ class AcceptOrderSpec extends ObjectBehavior
     {
         $invoker = $this->seeder->uuid;
         $this->beConstructedWith(
-            $this->expectedInvoker = $invoker, 
-			$this->expectedOrderId = $this->seeder->word
+            $this->expectedInvoker = $invoker,
+            $this->expectedOrderId = $this->seeder->word
         );
     }
 
@@ -49,8 +50,8 @@ class AcceptOrderSpec extends ObjectBehavior
     {
         $invoker = str_repeat(' ', mt_rand(1, 10));
         $this->shouldThrow(InvalidArgumentException::class)->during('__construct', [
-            $invoker, 
-			$this->expectedOrderId = $this->seeder->word
+            $invoker,
+            $this->expectedOrderId = $this->seeder->word
         ]);
     }
 
@@ -59,8 +60,8 @@ class AcceptOrderSpec extends ObjectBehavior
         $this->invoker()->shouldReturn($this->expectedInvoker);
     }
 
-    
-    public function it_has_orderId()
+
+    public function it_has_an_order_identifier()
     {
         $this->orderId()->shouldReturn($this->expectedOrderId);
     }

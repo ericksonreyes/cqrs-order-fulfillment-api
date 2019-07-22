@@ -1,11 +1,12 @@
 <?php
+
 namespace spec\Fulfillment\Application;
 
-use Fulfillment\Application\CancelOrder;
 use Faker\Factory;
 use Faker\Generator;
-use PhpSpec\ObjectBehavior;
+use Fulfillment\Application\CancelOrder;
 use InvalidArgumentException;
+use PhpSpec\ObjectBehavior;
 
 
 class CancelOrderSpec extends ObjectBehavior
@@ -16,20 +17,20 @@ class CancelOrderSpec extends ObjectBehavior
     protected $seeder;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $expectedInvoker;
 
     /**
-	* @var string
-	*/
-	protected $expectedOrderId;
-	
-	/**
-	* @var string
-	*/
-	protected $expectedReason;
-	
+     * @var string
+     */
+    protected $expectedOrderId;
+
+    /**
+     * @var string
+     */
+    protected $expectedReason;
+
 
     public function __construct()
     {
@@ -40,9 +41,9 @@ class CancelOrderSpec extends ObjectBehavior
     {
         $invoker = $this->seeder->uuid;
         $this->beConstructedWith(
-            $this->expectedInvoker = $invoker, 
-			$this->expectedOrderId = $this->seeder->word, 
-			$this->expectedReason = $this->seeder->word
+            $this->expectedInvoker = $invoker,
+            $this->expectedOrderId = $this->seeder->word,
+            $this->expectedReason = $this->seeder->word
         );
     }
 
@@ -55,9 +56,9 @@ class CancelOrderSpec extends ObjectBehavior
     {
         $invoker = str_repeat(' ', mt_rand(1, 10));
         $this->shouldThrow(InvalidArgumentException::class)->during('__construct', [
-            $invoker, 
-			$this->expectedOrderId = $this->seeder->word, 
-			$this->expectedReason = $this->seeder->word
+            $invoker,
+            $this->expectedOrderId = $this->seeder->word,
+            $this->expectedReason = $this->seeder->word
         ]);
     }
 
@@ -66,14 +67,14 @@ class CancelOrderSpec extends ObjectBehavior
         $this->invoker()->shouldReturn($this->expectedInvoker);
     }
 
-    
-    public function it_has_orderId()
+
+    public function it_has_an_order_identifier()
     {
         $this->orderId()->shouldReturn($this->expectedOrderId);
     }
 
 
-    public function it_has_reason()
+    public function it_has_cancellation_reason()
     {
         $this->reason()->shouldReturn($this->expectedReason);
     }

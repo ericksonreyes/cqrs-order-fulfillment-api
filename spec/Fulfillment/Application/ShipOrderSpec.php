@@ -83,7 +83,7 @@ class ShipOrderSpec extends ObjectBehavior
     }
 
 
-    public function it_has_orderId()
+    public function it_has_an_order_identifier()
     {
         $this->orderId()->shouldReturn($this->expectedOrderId);
     }
@@ -95,13 +95,13 @@ class ShipOrderSpec extends ObjectBehavior
     }
 
 
-    public function it_has_trackingId()
+    public function it_has_tracking_identifier()
     {
         $this->trackingId()->shouldReturn($this->expectedTrackingId);
     }
 
 
-    public function it_has_dateShipped()
+    public function it_has_date_of_shipment()
     {
         $this->dateShipped()->shouldReturn($this->expectedDateShipped);
     }

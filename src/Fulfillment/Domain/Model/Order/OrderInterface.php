@@ -22,6 +22,10 @@ interface OrderInterface
 
     public const ERROR_EMPTY_ORDER = 'Your order is empty.';
 
+    public const ERROR_ORDER_NOT_FOUND = 'Order not found.';
+
+    public const ERROR_DUPLICATE_ORDER_ID = 'Duplicate order identifier.';
+
     public const ERROR_MISSING_CUSTOMER_ID = 'Your order has no customer information.';
 
     public const ERROR_MISSING_CREATED_BY = 'Need to know who created with order.';
@@ -35,6 +39,18 @@ interface OrderInterface
     public const ERROR_MISSING_CANCELLED_BY = 'Need to know who cancelled this order.';
 
     public const ERROR_MISSING_CLOSED_BY = 'Need to know who closed this order.';
+
+    public const ERROR_ORDER_WAS_ACCEPTED = 'This order was already accepted.';
+
+    public const ERROR_ORDER_WAS_CANCELLED = 'This order was already cancelled.';
+
+    public const ERROR_ORDER_WAS_COMPLETED = 'This order was already completed.';
+
+    public const ERROR_ORDER_WAS_SHIPPED = 'This order was already shipped.';
+
+    public const ERROR_ORDER_WAS_NOT_ACCEPTED = 'This order was not accepted.';
+
+    public const ERROR_ORDER_WAS_NOT_SHIPPED = 'This order was not shipped.';
 
     /**
      * @return string

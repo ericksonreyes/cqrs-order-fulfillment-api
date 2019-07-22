@@ -16,6 +16,12 @@ use Fulfillment\Domain\Model\Order\Exceptions\EmptyOrderError;
 use Fulfillment\Domain\Model\Order\Exceptions\MissingCustomerIdError;
 use Fulfillment\Domain\Model\Order\Exceptions\MissingShipperError;
 use Fulfillment\Domain\Model\Order\Exceptions\MissingTrackingIdError;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderWasAlreadyAcceptedError;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderWasAlreadyCancelledError;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderWasAlreadyClosedError;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderWasAlreadyShippedError;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderWasNotAcceptedOrder;
+use Fulfillment\Domain\Model\Order\Exceptions\OrderWasNotYetShippedError;
 use InvalidArgumentException;
 
 /**
@@ -39,7 +45,7 @@ class Order extends EventSourcedEntity implements OrderInterface
     /**
      * @var string
      */
-    protected $status;
+    protected $status = '';
 
     /**
      * @var DateTimeInterface
@@ -85,14 +91,6 @@ class Order extends EventSourcedEntity implements OrderInterface
     public function customerId(): string
     {
         return $this->customerId;
-    }
-
-    /**
-     * @return string
-     */
-    public function status(): string
-    {
-        return $this->status;
     }
 
     /**
@@ -153,8 +151,32 @@ class Order extends EventSourcedEntity implements OrderInterface
             throw new AnonymousOrderCommandError(OrderInterface::ERROR_MISSING_CREATED_BY);
         }
 
+        if ($this->status() === OrderInterface::ORDER_STATUS_ACCEPTED) {
+            throw new OrderWasAlreadyAcceptedError(OrderInterface::ERROR_ORDER_WAS_ACCEPTED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_SHIPPED) {
+            throw new OrderWasAlreadyShippedError(OrderInterface::ERROR_ORDER_WAS_SHIPPED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_CANCELLED) {
+            throw new OrderWasAlreadyCancelledError(OrderInterface::ERROR_ORDER_WAS_CANCELLED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_COMPLETED) {
+            throw new OrderWasAlreadyClosedError(OrderInterface::ERROR_ORDER_WAS_COMPLETED);
+        }
+
         $event = OrderWasAccepted::raise($acceptedBy, $this->id());
         $this->storeAndReplayThis($event);
+    }
+
+    /**
+     * @return string
+     */
+    public function status(): string
+    {
+        return $this->status;
     }
 
     /**
@@ -177,6 +199,23 @@ class Order extends EventSourcedEntity implements OrderInterface
         if (trim($trackingId) === '') {
             throw new MissingTrackingIdError(OrderInterface::ERROR_MISSING_TRACKING_ID);
         }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_PENDING) {
+            throw new OrderWasNotAcceptedOrder(OrderInterface::ERROR_ORDER_WAS_NOT_ACCEPTED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_SHIPPED) {
+            throw new OrderWasAlreadyShippedError(OrderInterface::ERROR_ORDER_WAS_SHIPPED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_CANCELLED) {
+            throw new OrderWasAlreadyCancelledError(OrderInterface::ERROR_ORDER_WAS_CANCELLED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_COMPLETED) {
+            throw new OrderWasAlreadyClosedError(OrderInterface::ERROR_ORDER_WAS_COMPLETED);
+        }
+
         $event = OrderWasShipped::raise($shippedBy, $this->id(), $shipper, $trackingId, $dateShipped);
         $this->storeAndReplayThis($event);
     }
@@ -192,6 +231,18 @@ class Order extends EventSourcedEntity implements OrderInterface
             throw new AnonymousOrderCommandError(OrderInterface::ERROR_MISSING_CANCELLED_BY);
         }
 
+        if ($this->status() === OrderInterface::ORDER_STATUS_SHIPPED) {
+            throw new OrderWasAlreadyShippedError(OrderInterface::ERROR_ORDER_WAS_SHIPPED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_CANCELLED) {
+            throw new OrderWasAlreadyCancelledError(OrderInterface::ERROR_ORDER_WAS_CANCELLED);
+        }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_COMPLETED) {
+            throw new OrderWasAlreadyClosedError(OrderInterface::ERROR_ORDER_WAS_COMPLETED);
+        }
+
         $event = OrderWasCancelled::raise($cancelledBy, $this->id(), $reason);
         $this->storeAndReplayThis($event);
     }
@@ -205,6 +256,15 @@ class Order extends EventSourcedEntity implements OrderInterface
         if (trim($closedBy) === '') {
             throw new AnonymousOrderCommandError(OrderInterface::ERROR_MISSING_CLOSED_BY);
         }
+
+        if ($this->status() === OrderInterface::ORDER_STATUS_COMPLETED) {
+            throw new OrderWasAlreadyClosedError(OrderInterface::ERROR_ORDER_WAS_COMPLETED);
+        }
+
+        if ($this->status() !== OrderInterface::ORDER_STATUS_SHIPPED) {
+            throw new OrderWasNotYetShippedError(OrderInterface::ERROR_ORDER_WAS_NOT_SHIPPED);
+        }
+
         $event = OrderWasCompleted::raise($closedBy, $this->id());
         $this->storeAndReplayThis($event);
     }
@@ -217,7 +277,7 @@ class Order extends EventSourcedEntity implements OrderInterface
     {
         $this->customerId = $event->customerId();
         $this->items = $event->items();
-        $this->status = 'Pending';
+        $this->status = self::ORDER_STATUS_PENDING;
         $this->postedOn = new DateTimeImmutable();
     }
 

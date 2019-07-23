@@ -2,7 +2,6 @@
 /.idea
 Homestead.json
 Homestead.yaml
-.env
 composer.lock
 /build/logs/*
 /bin
@@ -12,3 +11,4 @@ cghooks.lock
 /php.ini
 /php-silent.ini
 /database/database.sqlite
+/fulfillment

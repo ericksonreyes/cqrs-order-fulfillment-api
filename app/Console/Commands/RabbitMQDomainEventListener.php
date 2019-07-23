@@ -75,7 +75,8 @@ abstract class RabbitMQDomainEventListener extends Command
         $data['context'] = $data['context'] ?? 'Fulfillment';
 
         $this->warn(
-            " [ ] {$formattedDate} {$data['context']}.{$data['entityType']}.{$data['eventName']} event was raised "
+            " PHP: [ ] {$formattedDate} {$data['context']}.{$data['entityType']}.{$data['eventName']} " .
+            "event was raised. "
         );
 
         if ($this->projectors instanceof Projectors) {
@@ -85,7 +86,7 @@ abstract class RabbitMQDomainEventListener extends Command
                 foreach ($this->projectors->projectors() as $projector) {
                     $time = date('Y-m-d h:i:s');
                     if ($projector->project($event)) {
-                        $this->info(" [√] {$time} Projected by {$projector->name()}. ");
+                        $this->info(" PHP: [√] {$time} Projected by {$projector->name()}. ");
                     }
                 }
             }
@@ -121,7 +122,7 @@ abstract class RabbitMQDomainEventListener extends Command
                 }
                 $this->table(['Available listeners'], $projectors);
 
-                $this->line(' [*] Waiting for events. To exit press CTRL+C ');
+                $this->line(' PHP: [*] Waiting for events. To exit press CTRL+C ');
                 $this->eventSubscriber()->listen();
             } catch (Exception $exception) {
                 $this->line('');

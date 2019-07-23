@@ -33,7 +33,8 @@ projection generators. The state of the Orders are not saved, only the events re
 
 ## Starting the application
 * Run ```php -S 0.0.0.0:8000 -t ./public/``` to start the REST API server.
-* Run ```php artisan fulfillment:projection_generator``` to start the event listener that updates the projection tables. 
+* Run ```php artisan fulfillment:projection_generator``` to start the event listener that updates the projection tables.
+* Run ```python3 main.py``` to start the mock e-mail sending event listener. 
 
 ## How to use
 You can use the content of the [OpenAPI specification](./swagger.yml) of the REST API in the following:

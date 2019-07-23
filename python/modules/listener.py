@@ -49,7 +49,7 @@ class Listener:
             context = event['context'];
 
         print(
-        '\033[33m', '[ ]', datetime.datetime.now(), context + '.' + entity_type + '.' + event_name + ' was raised.',
+        '\033[33m', 'Python: [ ]', datetime.datetime.now(), context + '.' + entity_type + '.' + event_name + ' was raised.',
         '\033[0m')
 
         for handler in self.handlers:
@@ -67,22 +67,22 @@ class Listener:
                 connection = self.__open_connection()
                 channel = self.__open_channel(connection)
 
-                print(' [*] Waiting for events. To exit press CTRL+C')
+                print(' Python: [*] Waiting for events. To exit press CTRL+C')
                 try:
                     channel.start_consuming()
                 except KeyboardInterrupt:
-                    print('\033[91m', '[x] Terminated', '\033[0m')
+                    print('\033[91m', 'Python: [x] Terminated', '\033[0m')
                     channel.stop_consuming()
                     connection.close()
                 break
             except pika.exceptions.ConnectionClosedByBroker:
-                print('\033[91m', "[x] ", datetime.datetime.now(), "Connection was closed, retrying...", '\033[0m')
+                print('\033[91m', "Python: [x] ", datetime.datetime.now(), "Connection was closed, retrying...", '\033[0m')
                 pass
             except pika.exceptions.AMQPChannelError as err:
                 print(
-                    '\033[91m', "[x] ", datetime.datetime.now(), "Caught a channel error: {}, stopping...".format(err),
+                    '\033[91m', "Python: [x] ", datetime.datetime.now(), "Caught a channel error: {}, stopping...".format(err),
                     '\033[0m')
                 break
             except pika.exceptions.AMQPConnectionError:
-                print('\033[91m', "[x] ", datetime.datetime.now(), "Connection was closed, retrying...", '\033[0m')
+                print('\033[91m', "Python: [x] ", datetime.datetime.now(), "Connection was closed, retrying...", '\033[0m')
                 continue

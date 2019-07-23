@@ -8,9 +8,7 @@ composer.lock
 /bin
 .DS_Store
 /phpspec.yml
-/config/parameters.yml
 cghooks.lock
-composer.lock
 /php.ini
 /php-silent.ini
 /database/database.sqlite

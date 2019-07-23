@@ -4,6 +4,7 @@ namespace Fulfillment\Domain\Model\Order\Event;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use EricksonReyes\DomainDrivenDesign\Domain\AccountableEvent;
 use EricksonReyes\DomainDrivenDesign\Domain\Event;
 use Exception;
 
@@ -13,7 +14,7 @@ use Exception;
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OrderWasShipped implements Event
+class OrderWasShipped implements AccountableEvent
 {
 
     /**
@@ -66,7 +67,8 @@ class OrderWasShipped implements Event
         string $shipper,
         string $trackingId,
         DateTimeInterface $dateShipped
-    ): self {
+    ): self
+    {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

@@ -4,6 +4,7 @@
 namespace Fulfillment\Domain\Model\Order\Event;
 
 use DateTimeImmutable;
+use EricksonReyes\DomainDrivenDesign\Domain\AccountableEvent;
 use EricksonReyes\DomainDrivenDesign\Domain\Event;
 use Exception;
 
@@ -13,7 +14,7 @@ use Exception;
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-abstract class EmptyEvent implements Event
+abstract class EmptyEvent implements AccountableEvent
 {
 
     /**
@@ -48,7 +49,8 @@ abstract class EmptyEvent implements Event
     public static function raise(
         string $raisedBy,
         string $entityId
-    ): self {
+    ): self
+    {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

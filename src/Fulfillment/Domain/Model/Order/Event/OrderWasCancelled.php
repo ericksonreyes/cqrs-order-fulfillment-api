@@ -3,6 +3,7 @@
 namespace Fulfillment\Domain\Model\Order\Event;
 
 use DateTimeImmutable;
+use EricksonReyes\DomainDrivenDesign\Domain\AccountableEvent;
 use EricksonReyes\DomainDrivenDesign\Domain\Event;
 use Exception;
 
@@ -12,7 +13,7 @@ use Exception;
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OrderWasCancelled implements Event
+class OrderWasCancelled implements AccountableEvent
 {
     /**
      * @var string
@@ -53,7 +54,8 @@ class OrderWasCancelled implements Event
         string $raisedBy,
         string $entityId,
         string $reason
-    ): self {
+    ): self
+    {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

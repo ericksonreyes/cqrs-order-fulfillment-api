@@ -2,5 +2,9 @@ services:
   order_repository:
     class: App\Repositories\Command\EventSourcedOrderRepository
     arguments: ['@mysql_event_storage']
+
+  publishing_order_repository:
+    class: App\Repositories\Command\EventSourcedOrderRepository
+    arguments: ['@mysql_event_storage']
     calls:
       - [registerEventPublisher, [ '@rabbitmq_event_publisher']]

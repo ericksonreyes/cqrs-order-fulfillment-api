@@ -91,15 +91,21 @@ class MySqlEventStorage implements EventRepository
      */
     public function store(Event $domainEvent): void
     {
-        $newEvent = new EventModel();
-        $newEvent->event_id = $this->identityGenerator->nextIdentity('event-');
-        $newEvent->event_name = $domainEvent->eventName();
-        $newEvent->happened_on = time();
-        $newEvent->context_name = $domainEvent->entityContext();
-        $newEvent->entity_type = $domainEvent->entityType();
-        $newEvent->entity_id = $domainEvent->entityId();
-        $newEvent->event_data = json_encode($domainEvent->toArray());
-        $newEvent->event_meta_data = json_encode($_SERVER);
-        $newEvent->save();
+        $eventHash = base64_encode(serialize($domainEvent));
+
+        $newEvent = EventModel::where('event_hash', $eventHash)->first();
+        if (!$newEvent) {
+            $newEvent = new EventModel();
+            $newEvent->event_id = $this->identityGenerator->nextIdentity('event-');
+            $newEvent->event_name = $domainEvent->eventName();
+            $newEvent->happened_on = time();
+            $newEvent->context_name = $domainEvent->entityContext();
+            $newEvent->entity_type = $domainEvent->entityType();
+            $newEvent->entity_id = $domainEvent->entityId();
+            $newEvent->event_data = json_encode($domainEvent->toArray());
+            $newEvent->event_meta_data = json_encode($_SERVER);
+            $newEvent->event_hash = $eventHash;
+            $newEvent->save();
+        }
     }
 }

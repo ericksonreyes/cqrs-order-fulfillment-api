@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateOrdersTable extends Migration
 {
@@ -18,6 +18,10 @@ class CreateOrdersTable extends Migration
             $table->string('id', 150)->unique();
             $table->string('status', 150);
             $table->string('customerId', 150)->index();
+            $table->string('shipper', 150)->nullable();
+            $table->string('trackingId', 150)->nullable();
+            $table->string('cancellationReason', 255)->nullable();
+            $table->integer('dateShipped')->nullable();
             $table->integer('postedOn');
             $table->integer('lastUpdatedOn');
             $table->timestamps();

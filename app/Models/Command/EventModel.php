@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int happened_on
  * @property string event_name
  * @property string event_id
+ * @property string event_hash
  */
 class EventModel extends Model
 {

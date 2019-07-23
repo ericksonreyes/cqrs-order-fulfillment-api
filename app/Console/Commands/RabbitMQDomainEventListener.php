@@ -58,6 +58,49 @@ abstract class RabbitMQDomainEventListener extends Command
     }
 
     /**
+     * @return Container
+     */
+    protected function container(): Container
+    {
+        return $this->container;
+    }
+
+    /**
+     * @param $message
+     */
+    public function callback($message): void
+    {
+        $data = json_decode($message->body, true);
+        $formattedDate = date('Y-m-d h:i:s', $data['happenedOn']);
+        $data['context'] = $data['context'] ?? 'Fulfillment';
+
+        $this->warn(
+            " [ ] {$formattedDate} {$data['context']}.{$data['entityType']}.{$data['eventName']} event was raised "
+        );
+
+        if ($this->projectors instanceof Projectors) {
+            $event = $this->eventFactory()->makeEventFromName($data['eventName'], $data);
+
+            if ($event instanceof Event) {
+                foreach ($this->projectors->projectors() as $projector) {
+                    $time = date('Y-m-d h:i:s');
+                    if ($projector->project($event)) {
+                        $this->info(" [√] {$time} Projected by {$projector->name()}. ");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @return EventFactory
+     */
+    protected function eventFactory(): ?EventFactory
+    {
+        return $this->eventFactory;
+    }
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -94,93 +137,11 @@ abstract class RabbitMQDomainEventListener extends Command
     }
 
     /**
-     * @param $message
-     */
-    public function callback($message): void
-    {
-        $data = json_decode($message->body, true);
-        $formattedDate = date('Y-m-d h:i:s', $data['happenedOn']);
-
-        $this->warn(
-            " [ ] {$formattedDate} {$data['context']}.{$data['entityType']}.{$data['eventName']} event was raised "
-        );
-
-        if ($this->projectors instanceof Projectors) {
-            $event = $this->eventFactory()->makeEventFromName($data['eventName'], $data);
-
-            if ($event instanceof Event) {
-                foreach ($this->projectors->projectors() as $projector) {
-                    $time = date('Y-m-d h:i:s');
-                    if ($projector->project($event)) {
-                        $this->info(" [√] {$time} Projected by {$projector->name()}. ");
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param Projector $projector
-     */
-    public function addProjector(Projector $projector): void
-    {
-        $this->projectors[] = $projector;
-    }
-
-    /**
-     * @return string
-     */
-    protected function signature(): string
-    {
-        return $this->signature;
-    }
-
-    /**
      * @return string
      */
     protected function description(): ?string
     {
         return $this->description;
-    }
-
-    /**
-     * @return RabbitMQEventSubscriber
-     */
-    protected function eventSubscriber(): ?RabbitMQEventSubscriber
-    {
-        return $this->eventSubscriber;
-    }
-
-    /**
-     * @return EventFactory
-     */
-    protected function eventFactory(): ?EventFactory
-    {
-        return $this->eventFactory;
-    }
-
-    /**
-     * @return Projectors
-     */
-    protected function eventProjectors(): Projectors
-    {
-        return $this->projectors;
-    }
-
-    /**
-     * @param Projectors $eventProjectors
-     */
-    protected function setEventProjectors(Projectors $eventProjectors): void
-    {
-        $this->projectors = $eventProjectors;
-    }
-
-    /**
-     * @return Container
-     */
-    protected function container(): Container
-    {
-        return $this->container;
     }
 
     /**
@@ -211,5 +172,45 @@ abstract class RabbitMQDomainEventListener extends Command
             $this->line('');
             die();
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function signature(): string
+    {
+        return $this->signature;
+    }
+
+    /**
+     * @return Projectors
+     */
+    protected function eventProjectors(): Projectors
+    {
+        return $this->projectors;
+    }
+
+    /**
+     * @return RabbitMQEventSubscriber
+     */
+    protected function eventSubscriber(): ?RabbitMQEventSubscriber
+    {
+        return $this->eventSubscriber;
+    }
+
+    /**
+     * @param Projector $projector
+     */
+    public function addProjector(Projector $projector): void
+    {
+        $this->projectors[] = $projector;
+    }
+
+    /**
+     * @param Projectors $eventProjectors
+     */
+    protected function setEventProjectors(Projectors $eventProjectors): void
+    {
+        $this->projectors = $eventProjectors;
     }
 }

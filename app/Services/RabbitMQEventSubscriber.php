@@ -22,6 +22,11 @@ class RabbitMQEventSubscriber
     private $callback;
 
     /**
+     * @var string
+     */
+    private $queue;
+
+    /**
      * RabbitMQEventSubscriber constructor.
      * @param AMQPStreamConnection $connection
      * @param string $exchangeName
@@ -29,7 +34,8 @@ class RabbitMQEventSubscriber
     public function __construct(
         AMQPStreamConnection $connection,
         string $exchangeName
-    ) {
+    )
+    {
         $this->connection = $connection;
         $this->exchangeName = $exchangeName;
     }
@@ -43,23 +49,34 @@ class RabbitMQEventSubscriber
     }
 
     /**
+     * @param string $queue
+     */
+    public function setQueue(string $queue): void
+    {
+        $this->queue = $queue;
+    }
+
+
+    /**
      * @throws \ErrorException
      */
     public function listen(): void
     {
 
         $isDurable = true;
-        $queue = '';
+        $queue = $this->queue ?? '';
         $isPassive = false;
         $consumerTag = '';
         $isAutoDelete = false;
+        $isExclusive = false;
+        $noAck = false;
 
         $channel = $this->connection->channel();
         $channel->exchange_declare(
             $this->exchangeName,
             'fanout',
             $isPassive,
-            false,
+            $isDurable,
             $isAutoDelete
         );
 
@@ -67,7 +84,7 @@ class RabbitMQEventSubscriber
             $queue,
             $isPassive,
             $isDurable,
-            true,
+            $isExclusive,
             $isAutoDelete
         );
 
@@ -76,8 +93,8 @@ class RabbitMQEventSubscriber
             $queue_name,
             $consumerTag,
             false,
-            true,
-            false,
+            $noAck,
+            $isExclusive,
             false,
             $this->callback
         );

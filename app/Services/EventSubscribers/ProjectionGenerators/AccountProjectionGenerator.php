@@ -25,7 +25,7 @@ class AccountProjectionGenerator implements Projector
      */
     public function name(): string
     {
-        return 'ContactFolderProjectionGenerator';
+        return 'AccountProjectionGenerator';
     }
 
     /**
@@ -48,26 +48,25 @@ class AccountProjectionGenerator implements Projector
             $order->customerId = $event->customerId();
             $order->postedOn = $event->happenedOn();
 
-
             if ($wasProjected = $order->save()) {
                 $items = [];
-                foreach ($event->items() as $item) {
-                    $item = OrderItem::where('orderId', $event->entityId())
-                            ->where('productId', $item['productId'])
-                            ->first() ?? new OrderItem();
+                foreach ($event->items() as $itemArray) {
+                    if (!OrderItem::where('id', $itemArray['id'])->first()) {
+                        $item = new OrderItem();
+                        $item->id = $itemArray['id'];
+                        $item->orderId = $event->entityId();
+                        $item->productId = $itemArray['productId'];
+                        $item->price = $itemArray['price'];
+                        $item->quantity = $itemArray['quantity'];
 
-                    $item->id = $item['id'];
-                    $item->orderId = $event->entityId();
-                    $item->productId = $item['productId'];
-                    $item->price = $item['price'];
-                    $item->quantity = $item['quantity'];
-                    if ($item->save()) {
-                        $items[] = [
-                            'id' => $item['id'],
-                            'productId' => $item['productId'],
-                            'price' => $item['price'],
-                            'quantity' => $item['quantity']
-                        ];
+                        if ($item->save()) {
+                            $items[] = [
+                                'id' => $itemArray['id'],
+                                'productId' => $itemArray['productId'],
+                                'price' => $itemArray['price'],
+                                'quantity' => $itemArray['quantity']
+                            ];
+                        }
                     }
                 }
 

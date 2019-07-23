@@ -23,7 +23,7 @@ class CreateOrdersTable extends Migration
             $table->string('cancellationReason', 255)->nullable();
             $table->integer('dateShipped')->nullable();
             $table->integer('postedOn');
-            $table->integer('lastUpdatedOn');
+            $table->integer('lastUpdatedOn')->nullable();
             $table->timestamps();
         });
     }

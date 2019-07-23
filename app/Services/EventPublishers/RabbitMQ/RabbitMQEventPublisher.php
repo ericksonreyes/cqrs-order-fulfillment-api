@@ -22,6 +22,10 @@ class RabbitMQEventPublisher implements EventPublisher
      */
     private $exchangeName;
 
+    /**
+     * @var string
+     */
+    private $queue;
 
     /**
      * RabbitMQEventPublisher constructor.
@@ -34,6 +38,13 @@ class RabbitMQEventPublisher implements EventPublisher
         $this->exchangeName = $exchangeName;
     }
 
+    /**
+     * @param string $queue
+     */
+    public function setQueue(string $queue): void
+    {
+        $this->queue = $queue;
+    }
 
     /**
      * @param Event $domainEvent
@@ -42,13 +53,18 @@ class RabbitMQEventPublisher implements EventPublisher
     {
         $this->connection->reconnect();
         $channel = $this->connection->channel();
+
         $data = array_merge(['context' => $domainEvent->entityContext()], $domainEvent->toArray());
 
         $message = new AMQPMessage(json_encode($data), ['delivery_mode' => self::DELIVERY_MODE_PERSISTENT]);
+        $queue = $this->queue ?? '';
         $isPassive = false;
         $type = 'fanout';
-        $isDurable = false;
+        $isDurable = true;
         $isAutoDelete = false;
+        $isExclusive = false;
+
+        $channel->queue_declare($queue, $isPassive, $isDurable, $isExclusive, $isAutoDelete);
         $channel->exchange_declare($this->exchangeName, $type, $isPassive, $isDurable, $isAutoDelete);
         $channel->basic_publish($message, $this->exchangeName);
         $channel->close();

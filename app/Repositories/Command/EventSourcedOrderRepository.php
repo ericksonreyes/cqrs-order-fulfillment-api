@@ -24,7 +24,7 @@ class EventSourcedOrderRepository implements OrderRepository
     /**
      * @var EventPublisher[]
      */
-    private $publishers;
+    private $publishers = [];
 
     /**
      * EventSourcedAccountRepository constructor.

@@ -3,3 +3,5 @@ services:
   event_subscriber:
     class: App\Services\RabbitMQEventSubscriber
     arguments: ['@rabbitmq_connection', '%rabbitmq_exchange_name%']
+    calls:
+      - [setQueue, ['%rabbitmq_queue%']]

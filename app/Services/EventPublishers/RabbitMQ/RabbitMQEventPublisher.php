@@ -57,16 +57,23 @@ class RabbitMQEventPublisher implements EventPublisher
         $data = array_merge(['context' => $domainEvent->entityContext()], $domainEvent->toArray());
 
         $message = new AMQPMessage(json_encode($data), ['delivery_mode' => self::DELIVERY_MODE_PERSISTENT]);
-        $queue = $this->queue ?? '';
         $isPassive = false;
         $type = 'fanout';
         $isDurable = true;
         $isAutoDelete = false;
-        $isExclusive = false;
 
-        $channel->queue_declare($queue, $isPassive, $isDurable, $isExclusive, $isAutoDelete);
         $channel->exchange_declare($this->exchangeName, $type, $isPassive, $isDurable, $isAutoDelete);
+        $channel->queue_bind($this->queue(), $this->exchangeName, $this->queue());
         $channel->basic_publish($message, $this->exchangeName);
         $channel->close();
+    }
+
+    /**
+     * @return string
+     */
+    private function queue(): string
+    {
+        $queue = trim(($this->queue ?? ''));
+        return $queue === '' ? __CLASS__ : 'PHP_' . $queue;
     }
 }

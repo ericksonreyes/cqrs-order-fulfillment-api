@@ -56,7 +56,6 @@ class RabbitMQEventSubscriber
         $this->queue = $queue;
     }
 
-
     /**
      * @throws \ErrorException
      */
@@ -64,7 +63,7 @@ class RabbitMQEventSubscriber
     {
 
         $isDurable = true;
-        $queue = $this->queue ?? '';
+        $queue = $this->queue();
         $isPassive = false;
         $consumerTag = '';
         $isAutoDelete = false;
@@ -80,7 +79,7 @@ class RabbitMQEventSubscriber
             $isAutoDelete
         );
 
-        [$queue_name, ,] = $channel->queue_declare(
+        [$queueName, ,] = $channel->queue_declare(
             $queue,
             $isPassive,
             $isDurable,
@@ -88,9 +87,10 @@ class RabbitMQEventSubscriber
             $isAutoDelete
         );
 
-        $channel->queue_bind($queue_name, $this->exchangeName);
+        $channel->queue_bind($this->queue(), $this->exchangeName, $this->queue());
+
         $channel->basic_consume(
-            $queue_name,
+            $queueName,
             $consumerTag,
             false,
             $noAck,
@@ -108,5 +108,14 @@ class RabbitMQEventSubscriber
 
         $channel->close();
         $this->connection->reconnect();
+    }
+
+    /**
+     * @return string
+     */
+    private function queue(): string
+    {
+        $queue = trim(($this->queue ?? ''));
+        return $queue === '' ? __CLASS__ : 'PHP_' . $queue;
     }
 }

@@ -90,6 +90,7 @@ abstract class RabbitMQDomainEventListener extends Command
                 }
             }
         }
+        $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
     }
 
     /**

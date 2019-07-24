@@ -8,3 +8,5 @@ def handle(event_name, context, happened_on, entity_type, entity_id, data):
         print('\033[32m', 'Python: [√]', datetime.datetime.now(), 'Let\'s pretend an email was sent to the customer telling him that the order was cancelled.')
     if event_name == "OrderWasShipped":
         print('\033[32m', 'Python: [√]', datetime.datetime.now(), 'Let\'s pretend an email was sent to the customer telling him that the order was shipped.')
+    if event_name == "OrderWasShipped":
+        print('\033[32m', 'Python: [√]', datetime.datetime.now(), 'Let\'s pretend an email was sent to the customer thanking him and the order was completed.')

@@ -1,3 +1,4 @@
+# This file is auto-generated during the composer install
 parameters:
   application_host: 'http://localhost:8000'
   issuer_name: null
@@ -8,4 +9,5 @@ parameters:
   rabbitmq_username: guest
   rabbitmq_password: guest
   rabbitmq_vhost: /
-  rabbitmq_exchange_name: orders
+  rabbitmq_exchange_name: DomainEvents
+  rabbitmq_queue: FulfillmentQueue

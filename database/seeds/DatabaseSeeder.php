@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         if (env('APP_ENV') !== 'production') {
             $this->call(Products::class);
+            $this->call(Employees::class);
         }
     }
 }

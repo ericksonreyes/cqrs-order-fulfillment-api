@@ -325,6 +325,8 @@ paths:
       summary: Get all our products.
       description: API for getting all products.
       operationId: getAllProducts
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: Collection of our existing products.
@@ -364,6 +366,8 @@ paths:
           in: path
           required: true
           type: string
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: ""
@@ -404,6 +408,10 @@ definitions:
       price:
         type: integer
         description: Price
+        readOnly: true
+      stock:
+        type: integer
+        description: Number of items left in the inventory.
         readOnly: true
 
   Order:

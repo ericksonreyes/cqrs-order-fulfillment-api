@@ -1,9 +1,0 @@
-services:
-
-  elasticsearch_client:
-    factory: [ App\Services\EventStorages\ElasticSearch\ElasticSearchClientBuilder , 'build']
-    arguments: ['%elasticsearch_event_store_hosts%']
-
-  elasticsearch_event_storage:
-    class: App\Services\EventStorages\ElasticSearch\ElasticSearchEventStorage
-    arguments: ['@elasticsearch_client', '@event_factory']

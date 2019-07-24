@@ -1,5 +1,9 @@
 services:
   command_bus:
-    class: DDDCommon\Helper\CommandBus
+    class: EricksonReyes\DomainDrivenDesign\Application\CommandBus
     calls:
-#      - [addHandler, [ Acme\Sales\Application\Customer\SignUpCustomerPartially, '@handler_customer_partial_sign_up']]
+      - [addHandler, ['@create_order_handler', Fulfillment\Application\CreateOrder ]]
+      - [addHandler, ['@accept_order_handler', Fulfillment\Application\AcceptOrder]]
+      - [addHandler, ['@cancel_order_handler', Fulfillment\Application\CancelOrder ]]
+      - [addHandler, ['@close_order_handler', Fulfillment\Application\CloseOrder]]
+      - [addHandler, ['@ship_order_handler', Fulfillment\Application\ShipOrder]]

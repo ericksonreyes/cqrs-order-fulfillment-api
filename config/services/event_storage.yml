@@ -4,4 +4,3 @@ services:
     arguments: ['@mysql_event_storage']
     calls:
       - [addPublisher, ['@rabbitmq_event_publisher']]
-      - [addRepository, ['@elasticsearch_event_storage']]

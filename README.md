@@ -1,87 +1,65 @@
-# Project Title
+# CQRS, Domain-Driven Design &amp; Event Sourcing Inspired Order Fulfillment API
 
-One Paragraph of project description goes here
+This will be the Order Fulfillment REST API that will handle the orders placed from the [Shopping Cart API](https://github.com/ericksonreyes/cqrs-shopping-cart-api).
 
-## Getting Started
+## Description
+Our goal is to show how CQRS and Event Sourcing works but with minimal configuration so instead of asking you
+to install MySQL or MongoDB we will just use SQLite3 for data storage. The domain codes are unit tested and we are using 
+[Hexagonal Architecture](https://fideloper.com/hexagonal-architecture). We also used [Symfony's Dependency Injection Component](https://symfony.com/doc/current/components/dependency_injection.html)
+for easy configuration of parameters and service. 
+ 
+This repository will play as your Order Fulfillment System (Or whatever it is called) REST API server.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Orders can be created via published Domain Events or via the create order API end point. Orders are manipulated via the 
+projection generators. The state of the Orders are not saved, only the events relevant to it.
 
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [PHP](https://www.php.net/)
+* [Lumen Framework](https://lumen.laravel.com/)
+* [RabbitMQ](https://www.rabbitmq.com/)
+* [Python3](https://www.python.org/download/releases/3.0/)
 
-## Contributing
+## Requirements
+* [NodeJS](https://nodejs.org/)
+* [RabbitMQ](https://www.rabbitmq.com/)
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+## Installation
+* Run ```composer install```
+* Run ```pip3 install pika```
+* Run ```pip3 install pyyaml```
+* Run ```pip3 install python-dotenv``` 
+
+## Starting the application
+* Run ```php -S 0.0.0.0:8000 -t ./public/``` to start the REST API server.
+* Run ```php artisan fulfillment:projection_generator``` to start the event listener that updates the projection tables.
+* Run ```python3 main.py``` to start the mock e-mail sending event listener. 
+
+## How to use
+You can use the content of the [OpenAPI specification](./swagger.yml) of the REST API in the following:
+
+* [Swagger Editor](https://editor.swagger.io)
+* [Postman](https://www.getpostman.com)
+
+The swagger.yml host is already http://localhost:8000 by default. So no need to configure much and just test the application.
+Keep the application is using the default credentials of RabbitMQ (guest/guest) so no need to configure it too. Also keep the 
+[Shopping Cart API](https://github.com/ericksonreyes/cqrs-shopping-cart-api) application up and running together with this application.
+
+## Built With
+
+* [PHP](https://www.php.net/)
+* [Lumen Framework](https://lumen.laravel.com/)
+* [RabbitMQ](https://www.rabbitmq.com/)
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/ericksonreyes/cqrs-shopping-cart-api/tags). 
 
-## Authors
+## Author
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Erickson Reyes** - *Initial work* - [ericksonreyes](https://github.com/ericksonreyes)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc

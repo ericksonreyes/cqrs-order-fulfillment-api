@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Exception\PermissionDenied;
-use App\Http\Controllers\Helper\UserScopes;
 use EricksonReyes\DomainDrivenDesign\Common\Exception\AuthenticationFailureException;
 use EricksonReyes\DomainDrivenDesign\Common\Exception\DeletedRecordException;
 use EricksonReyes\DomainDrivenDesign\Common\Exception\PermissionDeniedException;
@@ -30,18 +28,14 @@ abstract class Controller extends BaseController
      * @var array
      */
     private static $exceptionMap = [
-        InvalidArgumentException::class => 400,
         AuthenticationFailureException::class => 401,
         PermissionDeniedException::class => 403,
         RecordNotFoundException::class => 404,
         DeletedRecordException::class => 410,
         RecordConflictException::class => 409,
+        InvalidArgumentException::class => 400,
     ];
 
-    /**
-     * @var UserScopes
-     */
-    protected $currentUserScopes;
 
     /**
      * @var string
@@ -67,23 +61,11 @@ abstract class Controller extends BaseController
     {
         $this->container = $container;
         $this->request = $request;
-        $this->currentUserScopes = new UserScopes();
 
         if ($request->has('token')) {
-            $this->currentUserScopes->addFromArray($request->get('token')['scope']);
             $this->currentUserId = $request->get('token')['sub'];
         }
     }
-
-
-    /**
-     * @return UserScopes
-     */
-    public function currentUserScopes(): UserScopes
-    {
-        return $this->currentUserScopes;
-    }
-
 
     /**
      * @return string
@@ -92,45 +74,6 @@ abstract class Controller extends BaseController
     {
         return $this->currentUserId;
     }
-
-
-    /**
-     * @param string $intendedAction
-     * @param string $requestedContext
-     * @param string $requestedModel
-     * @return bool
-     */
-    protected function userMustHavePermissionTo(
-        string $intendedAction,
-        string $requestedContext,
-        string $requestedModel
-    ): bool {
-        foreach ($this->currentUserScopes()->scopes() as $scope) {
-            if ($scope->context() === $requestedContext && $scope->model() === $requestedModel) {
-                if ($scope->isAdmin()) {
-                    return true;
-                }
-                if ($scope->isAllowedTo($intendedAction)) {
-                    return true;
-                }
-            }
-        }
-
-        throw new PermissionDenied(
-            "You have no permission to perform this action {$requestedContext}.{$requestedModel}.
-            {$intendedAction}"
-        );
-    }
-
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function container(): ContainerInterface
-    {
-        return $this->container;
-    }
-
 
     /**
      * @param Exception $exception
@@ -176,6 +119,14 @@ abstract class Controller extends BaseController
         );
     }
 
+    /**
+     * @param Exception $exception
+     * @return bool
+     */
+    private function isExceptionWithinHttpStatusCodeRange(\Exception $exception): bool
+    {
+        return $exception->getCode() >= 200 && $exception->getCode() < 600;
+    }
 
     /**
      * @param $response
@@ -213,25 +164,6 @@ abstract class Controller extends BaseController
         return $responseObject->setContent($stringContent)->header('Content-type', $expectedContentType);
     }
 
-
-    /**
-     * @return CommandBus|null
-     */
-    protected function handler(): ?CommandBus
-    {
-        return $this->container()->get('command_bus');
-    }
-
-
-    /**
-     * @param Exception $exception
-     * @return bool
-     */
-    private function isExceptionWithinHttpStatusCodeRange(\Exception $exception): bool
-    {
-        return $exception->getCode() >= 200 && $exception->getCode() < 600;
-    }
-
     /**
      * @param Response $response
      * @param $format
@@ -242,5 +174,21 @@ abstract class Controller extends BaseController
         $serializer = SerializerBuilder::create()->build();
         $newContent = $serializer->serialize(json_decode($response->content(), true), $format);
         return $newContent;
+    }
+
+    /**
+     * @return CommandBus|null
+     */
+    protected function handler(): ?CommandBus
+    {
+        return $this->container()->get('command_bus');
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function container(): ContainerInterface
+    {
+        return $this->container;
     }
 }

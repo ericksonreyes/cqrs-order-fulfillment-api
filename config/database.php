@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'migrations' => 'sales_migration_scripts',
+    'migrations' => 'migration_scripts',
 
     /*
     |--------------------------------------------------------------------------

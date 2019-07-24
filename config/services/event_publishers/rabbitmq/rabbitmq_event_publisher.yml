@@ -2,3 +2,5 @@ services:
   rabbitmq_event_publisher:
     class: App\Services\EventPublishers\RabbitMQ\RabbitMQEventPublisher
     arguments: ['@rabbitmq_connection', '%rabbitmq_exchange_name%']
+    calls:
+      - [setQueue, ['%rabbitmq_queue%']]

@@ -17,8 +17,8 @@ interface Projector
     public function name(): string;
 
     /**
-     * @param Event $domainEvent
+     * @param Event $event
      * @return bool
      */
-    public function project(Event $domainEvent): bool;
+    public function project(Event $event): bool;
 }

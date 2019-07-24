@@ -3,6 +3,7 @@
 namespace App\Repositories\Command;
 
 use EricksonReyes\DomainDrivenDesign\EventSourcedEntity;
+use EricksonReyes\DomainDrivenDesign\Infrastructure\EventPublisher;
 use EricksonReyes\DomainDrivenDesign\Infrastructure\EventRepository;
 use Fulfillment\Domain\Model\Order\Order;
 use Fulfillment\Domain\Model\Order\OrderInterface;
@@ -20,6 +21,10 @@ class EventSourcedOrderRepository implements OrderRepository
      */
     private $eventRepository;
 
+    /**
+     * @var EventPublisher[]
+     */
+    private $publishers = [];
 
     /**
      * EventSourcedAccountRepository constructor.
@@ -28,6 +33,14 @@ class EventSourcedOrderRepository implements OrderRepository
     public function __construct(EventRepository $eventRepository)
     {
         $this->eventRepository = $eventRepository;
+    }
+
+    /**
+     * @param EventPublisher $eventPublisher
+     */
+    public function registerEventPublisher(EventPublisher $eventPublisher): void
+    {
+        $this->publishers[] = $eventPublisher;
     }
 
     /**
@@ -56,6 +69,10 @@ class EventSourcedOrderRepository implements OrderRepository
         if ($order instanceof EventSourcedEntity) {
             foreach ($order->storedEvents() as $storedEvent) {
                 $this->eventRepository->store($storedEvent);
+
+                foreach ($this->publishers as $publisher) {
+                    $publisher->publish($storedEvent);
+                }
             }
         }
     }

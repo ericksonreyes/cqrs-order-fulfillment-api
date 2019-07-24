@@ -27,6 +27,7 @@ projection generators. The state of the Orders are not saved, only the events re
 
 ## Installation
 * Run ```composer install```
+* Run ``` php artisan migrate:fresh --seed```
 * Run ```pip3 install pika```
 * Run ```pip3 install pyyaml```
 * Run ```pip3 install python-dotenv``` 

@@ -23,7 +23,7 @@ $router->get('/', 'HomeController@index');
  * Public end points.
  *
  */
-$router->group(['prefix' => '/' . env('APP_VERSION') . '/v1/api'], function () use ($router) {
+$router->group(['prefix' => '/' . env('APP_VERSION') . '/api'], function () use ($router) {
     $router->post('/auth', 'AuthenticationController@auth');
 });
 
@@ -33,7 +33,7 @@ $router->group(['prefix' => '/' . env('APP_VERSION') . '/v1/api'], function () u
  *
  */
 $router->group(['middleware' => 'auth'], function () use ($router) {
-    $router->group(['prefix' => '/' . env('APP_VERSION') . '/v1/api'], function () use ($router) {
+    $router->group(['prefix' => '/' . env('APP_VERSION') . '/api'], function () use ($router) {
 
         /**
          * Products

@@ -75,7 +75,7 @@ class OrderWasCancelled implements AccountableEvent
         $event->happenedOn = DateTimeImmutable::createFromFormat('U', (string)$array['happenedOn']);
         $event->raisedBy = $array['data']['raisedBy'];
         $event->entityId = $array['data']['entityId'];
-        $event->reason = $array['data']['reason'];
+        $event->reason = $array['data']['reason'] ?? '';
         return $event;
     }
 

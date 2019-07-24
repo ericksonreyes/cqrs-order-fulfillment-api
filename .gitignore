@@ -12,3 +12,4 @@ cghooks.lock
 /php-silent.ini
 /database/database.sqlite
 /fulfillment
+__pycache__/

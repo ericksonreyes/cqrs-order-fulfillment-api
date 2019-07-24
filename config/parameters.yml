@@ -9,5 +9,5 @@ parameters:
   rabbitmq_username: guest
   rabbitmq_password: guest
   rabbitmq_vhost: /
-  rabbitmq_exchange_name: orders
-  rabbitmq_queue: orders
+  rabbitmq_exchange_name: DomainEvents
+  rabbitmq_queue: FulfillmentQueue

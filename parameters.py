@@ -11,7 +11,7 @@ amqp_config = {
     'port': config['rabbitmq_port'],
     'username': config['rabbitmq_username'],
     'password': config['rabbitmq_password'],
-    'queue': 'Python_' + config['rabbitmq_queue'],
+    'queue': config['rabbitmq_queue'],
     'auto_ack': False,
     'exchange_type': 'fanout'
 }

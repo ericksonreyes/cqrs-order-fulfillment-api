@@ -1,7 +1,7 @@
 # CQRS, Domain-Driven Design &amp; Event Sourcing Inspired Order Fulfillment API
 
 [![Build Status](https://img.shields.io/travis/ericksonreyes/cqrs-order-fulfillment-api.svg)](https://travis-ci.org/ericksonreyes/cqrs-order-fulfillment-api)
-[![Code Coverage](https://img.shields.io/coveralls/github/ericksonreyes/cqrs-order-fulfillment-api.svg)](https://coveralls.io/github/ericksonreyes/cqrs-order-fulfillment-api?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/ericksonreyes/cqrs-order-fulfillment-api/badge.svg?branch=master)](https://coveralls.io/github/ericksonreyes/cqrs-order-fulfillment-api?branch=master)
 [![License](https://img.shields.io/github/license/ericksonreyes/cqrs-order-fulfillment-api.svg)](LICENSE.MD)
 
 This will be the Order Fulfillment REST API that will handle the orders placed from the [Shopping Cart API](https://github.com/ericksonreyes/cqrs-shopping-cart-api).

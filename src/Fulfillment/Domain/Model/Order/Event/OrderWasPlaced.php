@@ -60,8 +60,7 @@ class OrderWasPlaced implements AccountableEvent
         string $entityId,
         string $customerId,
         array $items
-    ): self
-    {
+    ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

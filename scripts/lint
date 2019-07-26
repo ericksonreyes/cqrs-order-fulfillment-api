@@ -41,7 +41,7 @@ then
 	#Run phpmd
 	echo
 	echo "Checking for clean code violations..."
-	phpdbg -qrr bin/phpmd src/Acme html ./phpmd.xml --reportfile ./build/logs/phpmd/index.html
+	phpdbg -qrr bin/phpmd src html ./phpmd.xml --reportfile ./build/logs/phpmd/index.html
 	PHPMD_STATUS="$?"
 
 	if [ $PHPMD_STATUS -eq 1 ]

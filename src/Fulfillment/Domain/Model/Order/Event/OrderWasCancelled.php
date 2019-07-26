@@ -54,8 +54,7 @@ class OrderWasCancelled implements AccountableEvent
         string $raisedBy,
         string $entityId,
         string $reason
-    ): self
-    {
+    ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

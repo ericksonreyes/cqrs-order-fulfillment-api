@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Exception\OrderNotFoundError;
 use App\Models\Query\Order;
 use App\Models\Query\OrderItem;
+use DateTime;
 use Exception;
 use Fulfillment\Application\AcceptOrder;
 use Fulfillment\Application\CancelOrder;
@@ -128,7 +129,7 @@ class OrdersController extends Controller
                 $id,
                 $request->get('shipper'),
                 $request->get('trackingId'),
-                $request->get('dateShipped')
+                new DateTime('@' . $request->get('dateShipped'))
             );
             $this->handler()->execute($command);
 

@@ -67,8 +67,7 @@ class OrderWasShipped implements AccountableEvent
         string $shipper,
         string $trackingId,
         DateTimeInterface $dateShipped
-    ): self
-    {
+    ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

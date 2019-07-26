@@ -49,8 +49,7 @@ abstract class EmptyEvent implements AccountableEvent
     public static function raise(
         string $raisedBy,
         string $entityId
-    ): self
-    {
+    ): self {
         $event = new static();
 
         $event->happenedOn = new DateTimeImmutable();

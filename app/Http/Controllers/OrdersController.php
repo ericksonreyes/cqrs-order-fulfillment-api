@@ -12,7 +12,6 @@ use Fulfillment\Application\CloseOrder;
 use Fulfillment\Application\ShipOrder;
 use Illuminate\Http\Request;
 
-
 class OrdersController extends Controller
 {
 
@@ -84,7 +83,7 @@ class OrdersController extends Controller
                 'items' => []
             ];
 
-            $items = OrderItem::where('orderId', $order->id)->get();
+            $items = OrderItem::where('orderId', $id)->get();
             foreach ($items as $item) {
                 $order['items'][] = [
                     'id' => $item->id,

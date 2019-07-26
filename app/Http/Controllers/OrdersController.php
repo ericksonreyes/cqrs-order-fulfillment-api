@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Exception\OrderNotFoundError;
 use App\Models\Query\Order;
 use App\Models\Query\OrderItem;
+use DateTime;
 use Exception;
 use Fulfillment\Application\AcceptOrder;
 use Fulfillment\Application\CancelOrder;
 use Fulfillment\Application\CloseOrder;
 use Fulfillment\Application\ShipOrder;
 use Illuminate\Http\Request;
-
 
 class OrdersController extends Controller
 {
@@ -84,7 +84,7 @@ class OrdersController extends Controller
                 'items' => []
             ];
 
-            $items = OrderItem::where('orderId', $order->id)->get();
+            $items = OrderItem::where('orderId', $id)->get();
             foreach ($items as $item) {
                 $order['items'][] = [
                     'id' => $item->id,
@@ -129,7 +129,7 @@ class OrdersController extends Controller
                 $id,
                 $request->get('shipper'),
                 $request->get('trackingId'),
-                $request->get('dateShipped')
+                new DateTime('@' . $request->get('dateShipped'))
             );
             $this->handler()->execute($command);
 

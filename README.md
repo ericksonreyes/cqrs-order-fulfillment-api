@@ -47,6 +47,9 @@ You can use the content of the [OpenAPI specification](./swagger.yml) of the RES
 * [Swagger Editor](https://editor.swagger.io)
 * [Postman](https://www.getpostman.com)
 
+Using Swagger as testing tool and when all listeners are running. Your screen may look like this:
+![Testing screenshot](images/Testing.png)
+
 The swagger.yml host is already http://localhost:8000 by default. So no need to configure much and just test the application.
 Keep the application is using the default credentials of RabbitMQ (guest/guest) so no need to configure it too. Also keep the 
 [Shopping Cart API](https://github.com/ericksonreyes/cqrs-shopping-cart-api) application up and running together with this application.

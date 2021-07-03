@@ -4,7 +4,7 @@ parameters:
   issuer_name: null
   jwt_algorithm: HS256
   jwt_secret_key: secret-word
-  rabbitmq_host: 127.0.0.1
+  rabbitmq_host: 172.17.0.1
   rabbitmq_port: 5672
   rabbitmq_username: guest
   rabbitmq_password: guest

@@ -3,7 +3,6 @@ fulfillment.sqlite
 /.idea
 Homestead.json
 Homestead.yaml
-composer.lock
 /build/logs/*
 /bin
 .DS_Store

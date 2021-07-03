@@ -26,20 +26,17 @@ projection generators. The state of the Orders are not saved, only the events re
 * [Python3](https://www.python.org/download/releases/3.0/)
 
 ## Requirements
-* [NodeJS](https://nodejs.org/)
-* [RabbitMQ](https://www.rabbitmq.com/)
+* [Docker](https://www.docker.com/)
 
 ## Installation
-* Run ```composer install```
-* Run ``` php artisan migrate:fresh --seed```
-* Run ```pip3 install pika```
-* Run ```pip3 install pyyaml```
-* Run ```pip3 install python-dotenv``` 
+* Run ```docker-compose build```
+* Run ```docker-compose run composer install```
 
 ## Starting the application
-* Run ```php -S 0.0.0.0:8000 -t ./public/``` to start the REST API server.
-* Run ```php artisan fulfillment:projection_generator``` to start the event listener that updates the projection tables.
-* Run ```python3 main.py``` to start the mock e-mail sending event listener. 
+* Run ```docker-compose up cqrs-php```
+* Run ```docker-compose run php artisan migrate:fresh --seed```
+* Run ```docker-compose run -T php artisan fulfillment:projection_generator``` to start the event listener that updates the projection tables.
+* Run ```docker-compose run python main.py``` to start the mock e-mail sending event listener. 
 
 ## How to use
 You can use the content of the [OpenAPI specification](./swagger.yml) of the REST API in the following:

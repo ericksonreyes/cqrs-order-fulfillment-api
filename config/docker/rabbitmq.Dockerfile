@@ -1,0 +1,3 @@
+FROM rabbitmq:3.8.14-management-alpine
+
+EXPOSE 4369 5671 5672 15672 15691 15692 25672

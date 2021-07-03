@@ -1,0 +1,11 @@
+/__pycache__/
+/.idea
+vendor/
+bin/
+build/logs/*
+storage/data/elasticsearch/*
+storage/data/mongodb/*
+storage/data/mysql/*
+storage/data/rabbitmq/*
+storage/data/sqlite3/*
+storage/logs/*

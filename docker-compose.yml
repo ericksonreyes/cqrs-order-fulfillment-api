@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: config/docker/rabbitmq.Dockerfile
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - 'cqrs-php-demo'
+
+  cqrs-php:
+    build:
+      context: .
+      dockerfile: config/docker/nginx.Dockerfile
+    ports:
+      - '8000:80'
+    volumes:
+      - "./storage/nginx:/var/log/nginx:delegated"
+      - "./config/docker/config/nginx/docker.nginx.conf:/etc/nginx/nginx.conf:ro"
+    depends_on:
+      - rabbitmq
+      - phpfpm
+    networks:
+      - 'cqrs-php-demo'
+
+  phpfpm:
+    build:
+      context: .
+      dockerfile: config/docker/php-fpm.Dockerfile
+    volumes:
+      - "./:/var/www/html"
+      - "./vendor:/var/www/html/vendor:delegated"
+      - "./bin:/var/www/html/bin:delegated"
+    networks:
+      - 'cqrs-php-demo'
+
+  composer:
+    build:
+      context: .
+      dockerfile: config/docker/composer.Dockerfile
+    volumes:
+      - "./:/var/www/html"
+      - "./vendor:/var/www/html/vendor:delegated"
+      - "./bin:/var/www/html/bin:delegated"
+    tty: true
+    networks:
+      - 'cqrs-php-demo'
+
+  python:
+    build:
+      context: .
+      dockerfile: config/docker/python.Dockerfile
+    volumes:
+      - "./:/var/www/html"
+      - "./vendor:/var/www/html/vendor:delegated"
+      - "./bin:/var/www/html/bin:delegated"
+    tty: true
+    networks:
+      - 'cqrs-php-demo'
+
+  php:
+    build:
+      context: .
+      dockerfile: config/docker/php-cli.Dockerfile
+    volumes:
+      - "./:/var/www/html"
+      - "./vendor:/var/www/html/vendor:delegated"
+      - "./bin:/var/www/html/bin:delegated"
+    tty: true
+    networks:
+      - 'cqrs-php-demo'
+
+
+
+networks:
+  cqrs-php-demo:

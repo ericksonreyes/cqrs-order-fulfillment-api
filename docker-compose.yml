@@ -53,7 +53,7 @@ services:
     networks:
       - 'cqrs-php-demo'
 
-  listener:
+  python:
     build:
       context: .
       dockerfile: config/docker/python.Dockerfile

@@ -33,17 +33,22 @@ projection generators. The state of the Orders are not saved, only the events re
 * Run ```docker-compose run --rm composer install```
 
 ## Starting the application
-* Run ```docker-compose up server``` in a separate command line interface.
+* Run ```docker-compose up -d server``` to start the Node and NGINX servers as daemon. 
 * Run ```docker-compose run --rm php artisan migrate:fresh --seed``` in a separate command line interface.
 * Run ```docker-compose run --rm -T php artisan fulfillment:projection_generator``` in a separate command line interface to 
 start the event listener that updates the projection tables.
-* Run ```docker-compose run python main.py``` in a separate command line interface to start the mock e-mail sending event listener. 
+* Run ```docker-compose run --rm python main.py``` in a separate command line interface to start the mock e-mail sending event listener. 
 
 ## How to use
 You can use the content of the [OpenAPI specification](./swagger.yml) of the REST API in the following:
 
 * [Swagger Editor](https://editor.swagger.io)
 * [Postman](https://www.getpostman.com)
+
+Test login credentials.
+
+* Username: employee
+* Password: password
 
 Using Swagger as testing tool and when all listeners are running. Your screen may look like this:
 ![Testing screenshot](images/Testing.png)

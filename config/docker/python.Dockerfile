@@ -18,4 +18,8 @@ RUN pip install pyyaml
 
 RUN pip install python-dotenv
 
-ENTRYPOINT [ "python" ]
+WORKDIR /var/www/html
+
+COPY . .
+
+ENTRYPOINT [ "python3" ]

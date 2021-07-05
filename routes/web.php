@@ -1,5 +1,4 @@
 <?php
-
 use Laravel\Lumen\Routing\Router;
 
 /*
@@ -43,6 +42,8 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 
         /**
          * Orders
+         *
+         * @Todo Update swagger file with PUT routes of controller
          */
         $router->get('/orders', 'OrdersController@findAll');
         $router->get('/orders/{id}', 'OrdersController@findOne');

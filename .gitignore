@@ -13,3 +13,4 @@ cghooks.lock
 /database/database.sqlite
 /fulfillment.sqlite
 __pycache__/
+/storage/nginx/*

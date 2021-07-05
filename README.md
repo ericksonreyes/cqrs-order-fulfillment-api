@@ -30,13 +30,14 @@ projection generators. The state of the Orders are not saved, only the events re
 
 ## Installation
 * Run ```docker-compose build```
-* Run ```docker-compose run composer install```
+* Run ```docker-compose run --rm composer install```
 
 ## Starting the application
-* Run ```docker-compose up cqrs-php```
-* Run ```docker-compose run php artisan migrate:fresh --seed```
-* Run ```docker-compose run -T php artisan fulfillment:projection_generator``` to start the event listener that updates the projection tables.
-* Run ```docker-compose run python main.py``` to start the mock e-mail sending event listener. 
+* Run ```docker-compose up server``` in a separate command line interface.
+* Run ```docker-compose run --rm php artisan migrate:fresh --seed``` in a separate command line interface.
+* Run ```docker-compose run --rm -T php artisan fulfillment:projection_generator``` in a separate command line interface to 
+start the event listener that updates the projection tables.
+* Run ```docker-compose run python main.py``` in a separate command line interface to start the mock e-mail sending event listener. 
 
 ## How to use
 You can use the content of the [OpenAPI specification](./swagger.yml) of the REST API in the following:

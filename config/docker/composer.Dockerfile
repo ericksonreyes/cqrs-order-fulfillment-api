@@ -1,4 +1,4 @@
-FROM composer:1.10.22
+FROM composer:latest
 
 WORKDIR /usr/local/etc/php/conf.d/
 

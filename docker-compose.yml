@@ -15,7 +15,7 @@ services:
     networks:
       - 'cqrs-php-demo'
 
-  cqrs-php:
+  server:
     build:
       context: .
       dockerfile: config/docker/nginx.Dockerfile
